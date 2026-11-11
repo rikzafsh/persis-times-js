@@ -1,0 +1,65 @@
+/**
+ * data_shim.js — Menyusun ulang data datar menjadi tabel baris [[a,b,c],...]
+ * dan memberi nama kelas seperti di Dart (SunDataL00.vsop87MtL0, MoonDataL001.elpMpp02MtL0, ...),
+ * sehingga kode inti hasil terjemahan tidak perlu diubah.
+ */
+const __rows=(g,k)=>{const o=PERSIS_DATA[g+"_"+k],w=o.w,r=new Array(o.n);for(let i=0;i<o.n;i++)r[i]=o.d.slice(i*w,i*w+w);return r;};
+const MoonDataB001 = { elpMpp02MtB0: __rows("moon","b001") };
+const MoonDataB002 = { elpMpp02MtB0: __rows("moon","b002") };
+const MoonDataB003 = { elpMpp02MtB0: __rows("moon","b003") };
+const MoonDataB004 = { elpMpp02MtB0: __rows("moon","b004") };
+const MoonDataB005 = { elpMpp02MtB0: __rows("moon","b005") };
+const MoonDataB006 = { elpMpp02MtB0: __rows("moon","b006") };
+const MoonDataB007 = { elpMpp02MtB0: __rows("moon","b007") };
+const MoonDataB008 = { elpMpp02MtB0: __rows("moon","b008") };
+const MoonDataB101 = { elpMpp02MtB1: __rows("moon","b101") };
+const MoonDataB201 = { elpMpp02MtB2: __rows("moon","b201") };
+const MoonDataL001 = { elpMpp02MtL0: __rows("moon","l001") };
+const MoonDataL002 = { elpMpp02MtL0: __rows("moon","l002") };
+const MoonDataL003 = { elpMpp02MtL0: __rows("moon","l003") };
+const MoonDataL004 = { elpMpp02MtL0: __rows("moon","l004") };
+const MoonDataL005 = { elpMpp02MtL0: __rows("moon","l005") };
+const MoonDataL006 = { elpMpp02MtL0: __rows("moon","l006") };
+const MoonDataL007 = { elpMpp02MtL0: __rows("moon","l007") };
+const MoonDataL008 = { elpMpp02MtL0: __rows("moon","l008") };
+const MoonDataL009 = { elpMpp02MtL0: __rows("moon","l009") };
+const MoonDataL010 = { elpMpp02MtL0: __rows("moon","l010") };
+const MoonDataL011 = { elpMpp02MtL0: __rows("moon","l011") };
+const MoonDataL012 = { elpMpp02MtL0: __rows("moon","l012") };
+const MoonDataL013 = { elpMpp02MtL0: __rows("moon","l013") };
+const MoonDataL101 = { elpMpp02MtL1: __rows("moon","l101") };
+const MoonDataL201 = { elpMpp02MtL2: __rows("moon","l201") };
+const MoonDataL301 = { elpMpp02MtL3: __rows("moon","l301") };
+const MoonDataR001 = { elpMpp02MtR0: __rows("moon","r001") };
+const MoonDataR002 = { elpMpp02MtR0: __rows("moon","r002") };
+const MoonDataR003 = { elpMpp02MtR0: __rows("moon","r003") };
+const MoonDataR004 = { elpMpp02MtR0: __rows("moon","r004") };
+const MoonDataR005 = { elpMpp02MtR0: __rows("moon","r005") };
+const MoonDataR006 = { elpMpp02MtR0: __rows("moon","r006") };
+const MoonDataR007 = { elpMpp02MtR0: __rows("moon","r007") };
+const MoonDataR008 = { elpMpp02MtR0: __rows("moon","r008") };
+const MoonDataR009 = { elpMpp02MtR0: __rows("moon","r009") };
+const MoonDataR010 = { elpMpp02MtR0: __rows("moon","r010") };
+const MoonDataR011 = { elpMpp02MtR0: __rows("moon","r011") };
+const MoonDataR012 = { elpMpp02MtR0: __rows("moon","r012") };
+const MoonDataR013 = { elpMpp02MtR0: __rows("moon","r013") };
+const MoonDataR101 = { elpMpp02MtR1: __rows("moon","r101") };
+const MoonDataR201 = { elpMpp02MtR2: __rows("moon","r201") };
+const MoonDataR301 = { elpMpp02MtR3: __rows("moon","r301") };
+const SunDataB00 = { vsop87MtB0: __rows("sun","b00") };
+const SunDataB01 = { vsop87MtB1: __rows("sun","b01") };
+const SunDataB02 = { vsop87MtB2: __rows("sun","b02") };
+const SunDataB03 = { vsop87MtB3: __rows("sun","b03") };
+const SunDataB04 = { vsop87MtB4: __rows("sun","b04") };
+const SunDataL00 = { vsop87MtL0: __rows("sun","l00") };
+const SunDataL01 = { vsop87MtL1: __rows("sun","l01") };
+const SunDataL02 = { vsop87MtL2: __rows("sun","l02") };
+const SunDataL03 = { vsop87MtL3: __rows("sun","l03") };
+const SunDataL04 = { vsop87MtL4: __rows("sun","l04") };
+const SunDataL05 = { vsop87MtL5: __rows("sun","l05") };
+const SunDataR00 = { vsop87MtR0: __rows("sun","r00") };
+const SunDataR01 = { vsop87MtR1: __rows("sun","r01") };
+const SunDataR02 = { vsop87MtR2: __rows("sun","r02") };
+const SunDataR03 = { vsop87MtR3: __rows("sun","r03") };
+const SunDataR04 = { vsop87MtR4: __rows("sun","r04") };
+const SunDataR05 = { vsop87MtR5: __rows("sun","r05") };

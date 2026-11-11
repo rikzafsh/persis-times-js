@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PERSIS TIMES JS</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+<h1>PERSIS TIMES JS</h1>
+<p class="sub">Port JavaScript dari pustaka Dart <code>persis_times</code> (MIT, abusabda): VSOP87D &amp; ELPMPP02 penuh, berjalan sepenuhnya di peramban tanpa peladen.</p>
+<div class="card"><h2>Masukan</h2>
+<div class="grid">
+<label>Kota<select id="city"></select></label>
+<label>Lintang (°, S negatif)<input id="lat" type="number" step="any"></label>
+<label>Bujur (°, T positif)<input id="lon" type="number" step="any"></label>
+<label>Ketinggian (m)<input id="elev" type="number" step="any" value="0"></label>
+<label>Zona waktu (jam)<input id="tz" type="number" step="any"></label>
+<label>Tanggal<input id="date" type="date"></label>
+<label>Metode<select id="method"></select></label>
+<label>Ihtiyat (menit)<input id="iht" type="number" step="1" value="0"></label>
+</div>
+<button id="go">Hitung</button></div>
+<div id="out"></div>
+</main>
+
+<!-- 1) data koefisien  2) inti astronomi  3) layanan  4) antarmuka (urutan penting) -->
+<script src="js/data/sun_vsop87d.js"></script>
+<script src="js/data/moon_elp_longitude.js"></script>
+<script src="js/data/moon_elp_latitude.js"></script>
+<script src="js/data/moon_elp_distance.js"></script>
+<script src="js/data/data_shim.js"></script>
+<script src="js/core/models.js"></script>
+<script src="js/core/prayer_method.js"></script>
+<script src="js/core/safe_math.js"></script>
+<script src="js/core/math_utils.js"></script>
+<script src="js/core/julian_day.js"></script>
+<script src="js/core/dynamical_time.js"></script>
+<script src="js/core/nutation.js"></script>
+<script src="js/core/sun.js"></script>
+<script src="js/core/moon_longitude.js"></script>
+<script src="js/core/moon_latitude.js"></script>
+<script src="js/core/moon_distance.js"></script>
+<script src="js/core/moon.js"></script>
+<script src="js/core/waktu_salat.js"></script>
+<script src="js/core/arah_kiblat.js"></script>
+<script src="js/services/calendar_service.js"></script>
+<script src="js/services/salat_service.js"></script>
+<script src="js/app/app.js"></script>
+</body>
+</html>
