@@ -14,24 +14,33 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | | `sun`, `moon_longitude/latitude/distance`, `moon` | Posisi dan fenomena Matahari/Bulan |
 | | `waktu_salat`, `arah_kiblat` | Algoritma salat dan kiblat |
 | 3. Layanan | `js/services/calendar_service.js`, `salat_service.js` | Kalender Hijriah, jadwal salat harian |
-| 4. Antarmuka | `js/app/app.js`, `css/style.css` | Satu-satunya bagian yang menyentuh DOM |
+| | `js/services/hisab_awal_bulan_service.js` | Hisab awal bulan: ijtimak, Magrib, data hilal, status MABIMS/Turki/WH |
+| | `js/services/peta_visibilitas_service.js` | Visibilitas hilal per lokasi: Odeh, Yallop, SAAO, Maunder, Bruin |
+| 4. Antarmuka | `js/app/app.js`, `app_hisab.js`, `css/style.css` | Satu-satunya bagian yang menyentuh DOM |
 
 Urutan `<script>` di `index.html` penting: data → inti → layanan → antarmuka.
 
-## Alur perhitungan waktu salat
-`SalatService.waktuSalatHarian` → `WaktuSalat` → `SunFunction` (VSOP87D + nutasi + ΔT) → jam desimal → ihtiyat.
+## Alur perhitungan
+- Waktu salat: `SalatService.waktuSalatHarian` → `WaktuSalat` → `SunFunction` (VSOP87D + nutasi + ΔT) → jam desimal → ihtiyat.
+- Hisab awal bulan: `MoonFunction.geocentricConjunction` (ijtimak) → `SunFunction.jdGhurubSyams` (Magrib) → posisi Matahari/Bulan saat Magrib → elongasi, tinggi hilal, kriteria.
 
-## Pakai sebagai pustaka
-```html
-<script src="js/data/sun_vsop87d.js"></script> ... (urutan seperti index.html, tanpa app.js)
-<script>
-  const r = new SalatService().waktuSalatHarian({tglM:10,blnM:11,thnM:2026,gLon:110.3695,gLat:-7.7956,elev:100,tmZn:7,
-                                                 prayerMethod:PrayerMethod.persatuanIslam});
-  r.subuh.time; // jam desimal
-</script>
+## Contoh pemakaian
+```js
+const r = new SalatService().waktuSalatHarian({tglM:10,blnM:11,thnM:2026,gLon:110.3695,gLat:-7.7956,elev:100,tmZn:7,
+                                               prayerMethod:PrayerMethod.persatuanIslam});
+r.subuh.time;                                   // jam desimal
+
+const h = new HisabAwalBulanService().hitung({blnH:10,thnH:1447,gLon:110.37,gLat:-7.80,tmZn:7,
+            elev:100,pres:1010,temp:10,tbhHari:0,optKriteria:1});
+h.geojdIjtimak; h.moonGeo.altitude; h.imkanMabimsStatus;   // 1 = memenuhi, 2 = belum
+
+const peta = new PetaVisibilitasService(), pre = peta.preHitung({blnH:10,thnH:1447});
+peta.hitung({blnH:10,thnH:1447,gLon:-74,gLat:40.7,tmZn:-5,tbhHari:1,jdIjtimak:pre.jdIjtimak,deltaT:pre.deltaT}).zonaOdeh;
 ```
+`blnH` = bulan Hijriah yang awalnya dihisab (10 = Syawwal). `tbhHari` menggeser hari Magrib dari tanggal lokal ijtimak.
+Peta dunia di antarmuka memakai Magrib pertama setelah ijtimak (opsi bisa diganti).
 
 ## Belum diport
-Gerhana Matahari/Bulan, hisab awal bulan, peta visibilitas hilal, rashdulqiblat.
+Gerhana Matahari/Bulan dan rashdulqiblat.
 
 Lisensi: lihat `LICENSE-persis_times.txt` (hak cipta asli abusabda, MIT).

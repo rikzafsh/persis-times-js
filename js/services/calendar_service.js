@@ -518,4 +518,5 @@ class CalendarService {
   _cjdnToJD(cjdn) { return (cjdn) - 0.5; }
 }
 
+
 const ab = new CalendarService();   // instans global yang dipakai antarmetode

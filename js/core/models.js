@@ -8,3 +8,12 @@ const SalatStatus = Object.freeze({normal:"normal",up:"up",down:"down",bright:"b
 class SalatValue { constructor({time=null,status}){this.time=time;this.status=status;} get isNormal(){return this.status===SalatStatus.normal;} }
 class SalatDailyResult { constructor(o){Object.assign(this,o);} }
 class QiblaEventResult { constructor(o){Object.assign(this,o);} }
+class SunDataGeo { constructor(o){Object.assign(this,o);} }
+class SunDataTopo { constructor(o){Object.assign(this,o);} }
+class MoonDataGeo { constructor(o){Object.assign(this,o);} }
+class MoonDataTopo { constructor(o){Object.assign(this,o);} }
+class HilalData { constructor(o){Object.assign(this,o);} }
+class HisabAwalBulanResult { constructor(o){Object.assign(this,o);} }
+class PetaVisibilitasHilalResult { constructor(o){Object.assign(this,o);} }
+
+// Model hasil hisab awal bulan & visibilitas: pembungkus objek polos.
