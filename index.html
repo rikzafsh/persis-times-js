@@ -7,10 +7,13 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<header class="hero"><div class="in">
+<h1>🕌 PERSIS TIMES JS</h1>
+<p class="sub">Waktu salat, kiblat, fase Bulan, musim, tithi, kalender Hijriah, hilal, dan gerhana — dihitung langsung di peramban tanpa peladen (VSOP87D &amp; ELPMPP02).</p>
+</div></header>
 <main>
-<h1>PERSIS TIMES JS</h1>
-<p class="sub">Port JavaScript dari pustaka Dart <code>persis_times</code> (MIT, abusabda): VSOP87D &amp; ELPMPP02 penuh, berjalan sepenuhnya di peramban tanpa peladen.</p>
-<div class="card"><h2>Masukan</h2>
+<details class="card" id="locbox" open>
+<summary><span>📍 Lokasi &amp; waktu</span><small id="locsum"></small></summary>
 <div class="grid">
 <label>Kota<select id="city"></select></label>
 <label>Lintang (°, S negatif)<input id="lat" type="number" step="any"></label>
@@ -18,16 +21,16 @@
 <label>Ketinggian (m)<input id="elev" type="number" step="any" value="0"></label>
 <label>Zona waktu (jam)<input id="tz" type="number" step="any"></label>
 <label>Tanggal<input id="date" type="date"></label>
-<label>Metode<select id="method"></select></label>
+<label>Metode salat<select id="method"></select></label>
 <label>Ihtiyat (menit)<input id="iht" type="number" step="1" value="0"></label>
 </div>
-<button id="go">Hitung</button></div>
-<div id="out"></div>
-<div id="hisab"></div>
-<div id="gerhana"></div>
+<button id="apply">Terapkan</button>
+</details>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Fitur"></nav>
+<div id="panels"></div>
+<footer>Port JavaScript dari <code>persis_times</code> (Dart, abusabda, MIT). Fase Bulan, musim, dan tithi adalah tambahan yang dihitung dari mesin yang sama.</footer>
 </main>
-
-<!-- 1) data koefisien  2) inti astronomi  3) layanan  4) antarmuka (urutan penting) -->
+<!-- urutan penting: 1) data  2) inti & layanan  3) antarmuka (ui.js dulu, main.js terakhir) -->
 <script src="js/data/sun_vsop87d.js"></script>
 <script src="js/data/moon_elp_longitude.js"></script>
 <script src="js/data/moon_elp_latitude.js"></script>
@@ -53,8 +56,15 @@
 <script src="js/services/solar_eclipse_service.js"></script>
 <script src="js/services/calendar_service.js"></script>
 <script src="js/services/salat_service.js"></script>
-<script src="js/app/app.js"></script>
-<script src="js/app/app_hisab.js"></script>
-<script src="js/app/app_gerhana.js"></script>
+<script src="js/services/astro_events_service.js"></script>
+<script src="js/app/ui.js"></script>
+<script src="js/app/tab_salat.js"></script>
+<script src="js/app/tab_posisi.js"></script>
+<script src="js/app/tab_fase.js"></script>
+<script src="js/app/tab_musim.js"></script>
+<script src="js/app/tab_tithi.js"></script>
+<script src="js/app/tab_hilal.js"></script>
+<script src="js/app/tab_gerhana.js"></script>
+<script src="js/app/main.js"></script>
 </body>
 </html>

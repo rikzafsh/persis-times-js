@@ -17,7 +17,9 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | | `js/services/hisab_awal_bulan_service.js` | Hisab awal bulan: ijtimak, Magrib, data hilal, status MABIMS/Turki/WH |
 | | `js/services/peta_visibilitas_service.js` | Visibilitas hilal per lokasi: Odeh, Yallop, SAAO, Maunder, Bruin |
 | | `js/services/lunar_eclipse_service.js`, `solar_eclipse_service.js` | Gerhana Bulan/Matahari: Besselian, kontak, magnitudo, global, lokal, rentang tahun H |
-| 4. Antarmuka | `js/app/app.js`, `app_hisab.js`, `app_gerhana.js`, `css/style.css` | Satu-satunya bagian yang menyentuh DOM |
+| | `js/services/astro_events_service.js` | **Tambahan** (bukan dari Dart): fase Bulan, solstis/ekuinoks, tithi |
+| 4. Antarmuka | `js/app/ui.js` | Kerangka: formulir lokasi, sistem tab, pemformat |
+| | `js/app/tab_*.js`, `main.js`, `css/style.css` | Satu berkas per tab: salat, posisi, fase, musim, tithi, hilal (+peta), gerhana |
 
 Urutan `<script>` di `index.html` penting: data → inti → layanan → antarmuka.
 
@@ -40,6 +42,21 @@ peta.hitung({blnH:10,thnH:1447,gLon:-74,gLat:40.7,tmZn:-5,tbhHari:1,jdIjtimak:pr
 ```
 `blnH` = bulan Hijriah yang awalnya dihisab (10 = Syawwal). `tbhHari` menggeser hari Magrib dari tanggal lokal ijtimak.
 Peta dunia di antarmuka memakai Magrib pertama setelah ijtimak (opsi bisa diganti).
+
+## Fase Bulan, Solstis & Ekuinoks, Tithi (tambahan)
+Pustaka Dart asli hanya memiliki `moonPhasesModified` (deret Meeus per bulan Hijriah). Tiga fitur ini ditambahkan di `AstroEvents`
+dengan pencarian akar (Newton) pada bujur tampak Matahari (VSOP87D) dan Bulan (ELPMPP02), ΔT otomatis. Semua waktu berupa JD UT.
+```js
+const A = new AstroEvents();
+A.phasesBetween(jdAwal, jdAkhir);   // [{jd, fase:0..3, nama}]  0=baru, 1=kuartal pertama, 2=purnama, 3=kuartal terakhir
+A.moonPhase(k);                     // k bulat = bulan baru; k+0.5 = purnama (k=0 ≈ 6 Jan 2000)
+A.seasons(2026);                    // [{jd, nama}] Ekuinoks Mar, Solstis Jun, Ekuinoks Sep, Solstis Des
+A.tithiSpan(jd);                    // {n:1..30, nama, paksha, awal, akhir}   (n 15 = Purnima, 30 = Amavasya)
+A.moonState(jd);                    // {elongasi, iluminasi(%), umur(hari), jarakKm}
+```
+Validasi: musim 2026 dan fase Maret 2026 cocok dengan USNO sampai menit (ekuinoks 20 Mar 14:45:53 UT, solstis 21 Jun 08:24:25 UT;
+purnama 3 Mar 11:37:50 UT, bulan baru 19 Mar 01:23:25 UT); bulan baru Meeus 1977 selisih ±3 detik. Tithi n berlangsung saat elongasi
+12°·(n−1) → 12°·n; Purnima berakhir tepat saat purnama.
 
 ## Gerhana
 ```js
