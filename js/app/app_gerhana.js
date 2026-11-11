@@ -21,7 +21,11 @@
     const d = new Date((jd - 2440587.5) * 864e5 + tz * 36e5);
     return d.getUTCDate() + "/" + pad(d.getUTCMonth() + 1) + "/" + d.getUTCFullYear() + " " + pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes());
   };
-  const dur = h => { if (h == null || !(h > 0)) return "—"; const m = Math.round(h * 60); return m >= 60 ? Math.floor(m / 60) + " j " + (m % 60) + " m" : (h * 3600 < 600 ? Math.floor(h * 60) + " m " + Math.round(h * 3600 % 60) + " d" : m + " m"); };
+  const dur = h => {                              // jam desimal → "j m" atau "m d"
+    if (h == null || !(h > 0)) return "—";
+    const sec = Math.round(h * 3600), m = Math.floor(sec / 60);
+    return sec >= 3600 ? Math.floor(m / 60) + " j " + (m % 60) + " m" : m + " m " + (sec % 60) + " d";
+  };
   const same = (a, b) => a.tahunHijri === b.tahunHijri && a.bulanHijri === b.bulanHijri;
   const title = s => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -34,15 +38,16 @@
         const S = new SolarEclipseService(), L = new LunarEclipseService(), r = { tahunAwalH: a, tahunAkhirH: b };
         const gs = S.solarEclipseGlobalRangeHijri({ ...r, timeScale: TimeScale.jdUT }), ls = L.lunarEclipseGlobalRangeHijri(r);
         const sl = S.solarEclipseLocalRangeHijri({ ...r, ...g, timeScale: TimeScale.jdUT }), ll = L.lunarEclipseLocalRangeHijri({ ...r, ...g, timeScale: TimeScale.jdUT });
+        const f = (v, d) => v == null ? "—" : v.toFixed(d);          // aman untuk nilai null (mis. umbra pada gerhana penumbral)
         const loc = (e, alt, mag, extra) => !e ? "Tidak terjadi di lokasi ini" :
-          (alt != null && alt < 0 ? "Puncak " + fmt(e, g.tmZn) + " — di bawah ufuk (tidak teramati)" : "Puncak " + fmt(e, g.tmZn) + ", tinggi " + alt.toFixed(1) + "°, magnitudo " + mag.toFixed(3) + (extra || ""));
+          (alt != null && alt < 0 ? "Puncak " + fmt(e, g.tmZn) + " — di bawah ufuk (tidak teramati)" : "Puncak " + fmt(e, g.tmZn) + ", tinggi " + f(alt, 1) + "°, magnitudo " + f(mag, 3) + (extra || ""));
         const solar = gs.filter(e => e.jenis && !/tidak/i.test(e.jenis)).map(e => {
           const l = sl.find(x => same(x, e));
-          return "<tr><td>" + fmt(e.mxUT, 0) + " UT</td><td>" + title(e.jenis) + "</td><td>" + (e.magnitude ?? 0).toFixed(3) + "</td><td>" + dur(e.durasiTotalitas) + "</td><td>" + loc(l && l.mxUT, l && l.altMx, l && l.magnitude, l ? ", obskurasi " + l.obscuration.toFixed(0) + "%" : "") + "</td></tr>";
+          return "<tr><td>" + fmt(e.mxUT, 0) + " UT</td><td>" + title(e.jenis) + "</td><td>" + (e.magnitude ?? 0).toFixed(3) + "</td><td>" + dur(e.durasiTotalitas) + "</td><td>" + loc(l && l.mxUT, l && l.altMx, l && l.magnitude, l ? ", obskurasi " + f(l.obscuration, 0) + "%" : "") + "</td></tr>";
         });
         const lunar = ls.filter(e => e.jenis && !/tidak/i.test(e.jenis)).map(e => {
           const l = ll.find(x => same(x, e));
-          return "<tr><td>" + fmt(e.mx, 0) + " UT</td><td>" + title(e.jenis) + "</td><td>—</td><td>" + dur(e.durasiTotal || e.durasiUmbral || e.durasiPenumbral) + "</td><td>" + loc(l && l.mx, l && l.altMx, l && l.magnitudeUmbral, "") + "</td></tr>";
+          return "<tr><td>" + fmt(e.mx, 0) + " UT</td><td>" + title(e.jenis) + "</td><td>—</td><td>" + dur(e.durasiTotal || e.durasiUmbral || e.durasiPenumbral) + "</td><td>" + loc(l && l.mx, l && l.altMx, l && (l.magnitudeUmbral ?? l.magnitudePenumbral), l && l.magnitudeUmbral == null ? " (penumbra)" : "") + "</td></tr>";
         });
         const tbl = (t, rows) => "<div class='card'><h2>" + t + " <small>(" + a + (b > a ? "–" + b : "") + " H)</small></h2><div class='wrap'><table><tr><td><b>Puncak</b></td><td><b>Jenis</b></td><td><b>Magnitudo</b></td><td><b>Durasi</b></td><td><b>Di lokasi Anda (zona " + g.tmZn + ")</b></td></tr>" + (rows.join("") || "<tr><td colspan='5'>Tidak ada gerhana.</td></tr>") + "</table></div></div>";
         $("gout").innerHTML = tbl("Gerhana Matahari", solar) + tbl("Gerhana Bulan", lunar) +
