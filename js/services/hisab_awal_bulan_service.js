@@ -115,8 +115,7 @@ class HisabAwalBulanService {
       sunsetJD,
       deltaT,
     );
-    const sunEquatorialHorizontalParallax = sn
-        .sunEquatorialHorizontalParallax(sunsetJD, deltaT);
+    const sunEquatorialHorizontalParallax = sn.sunEquatorialHorizontalParallax(sunsetJD, deltaT);
 
     const sunGeocentricDistanceAU = sn.sunGeocentricDistance(
       sunsetJD,
@@ -134,8 +133,7 @@ class HisabAwalBulanService {
       "ER",
     );
 
-    const greenwichApparentSiderealTime = sn
-        .greenwichApparentSiderialTime(sunsetJD, deltaT);
+    const greenwichApparentSiderealTime = sn.greenwichApparentSiderialTime(sunsetJD, deltaT);
 
     const localApparentSiderealTime = sn.localApparentSiderialTime(
       sunsetJD,
@@ -143,8 +141,7 @@ class HisabAwalBulanService {
       gLon,
     );
 
-    const sunGeocentricGreenwichHourAngle = sn
-        .sunGeocentricGreenwichHourAngle(sunsetJD, deltaT);
+    const sunGeocentricGreenwichHourAngle = sn.sunGeocentricGreenwichHourAngle(sunsetJD, deltaT);
     const sunGeocentricLocalHourAngle = sn.sunGeocentricLocalHourAngle(
       sunsetJD,
       deltaT,
@@ -201,8 +198,7 @@ class HisabAwalBulanService {
       "htu",
     );
 
-    const sunTopocentricAltitudeAirlessCenter = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeAirlessCenter = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -224,8 +220,7 @@ class HisabAwalBulanService {
       "htl",
     );
 
-    const sunTopocentricAltitudeApparentsUpper = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeApparentsUpper = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -236,8 +231,7 @@ class HisabAwalBulanService {
           "htau",
         );
 
-    const sunTopocentricAltitudeApparentCenter = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeApparentCenter = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -248,8 +242,7 @@ class HisabAwalBulanService {
           "htac",
         );
 
-    const sunTopocentricAltitudeApparentLower = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeApparentLower = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -260,8 +253,7 @@ class HisabAwalBulanService {
           "htal",
         );
 
-    const sunTopocentricAltitudeObserveredUpper = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeObserveredUpper = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -272,8 +264,7 @@ class HisabAwalBulanService {
           "htou",
         );
 
-    const sunTopocentricAltitudeObserveredCenter = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeObserveredCenter = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -284,8 +275,7 @@ class HisabAwalBulanService {
           "htoc",
         );
 
-    const sunTopocentricAltitudeObserveredLower = sn
-        .sunTopocentricAltitude(
+    const sunTopocentricAltitudeObserveredLower = sn.sunTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -304,8 +294,7 @@ class HisabAwalBulanService {
       elev,
     );
 
-    const sunTopocentricGreenwichHourAngle = sn
-        .sunTopocentricGreenwichHourAngle(sunsetJD, deltaT, gLon, gLat, elev);
+    const sunTopocentricGreenwichHourAngle = sn.sunTopocentricGreenwichHourAngle(sunsetJD, deltaT, gLon, gLat, elev);
     const sunTopocentricLocalHourAngle = sn.sunTopocentricLocalHourAngel(
       sunsetJD,
       deltaT,
@@ -345,8 +334,7 @@ class HisabAwalBulanService {
       deltaT,
     );
 
-    const moonGeocentricGreenwichHourAngle = mo
-        .moonGeocentricGreenwichHourAngle(sunsetJD, deltaT);
+    const moonGeocentricGreenwichHourAngle = mo.moonGeocentricGreenwichHourAngle(sunsetJD, deltaT);
 
     const moonGeocentricLocalHourAngle = mo.moonGeocentricLocalHourAngel(
       sunsetJD,
@@ -387,18 +375,15 @@ class HisabAwalBulanService {
       sunsetJD,
       deltaT,
     );
-    const moonEquatorialHorizontalParallax = mo
-        .moonEquatorialHorizontalParallax(sunsetJD, deltaT);
+    const moonEquatorialHorizontalParallax = mo.moonEquatorialHorizontalParallax(sunsetJD, deltaT);
 
     const moonGeocentricPhaseAngle = mo.moonGeocentricPhaseAngle(
       sunsetJD,
       deltaT,
     );
-    const moonGeocentricDiskIlluminatedFraction = mo
-        .moonGeocentricDiskIlluminatedFraction(sunsetJD, deltaT);
+    const moonGeocentricDiskIlluminatedFraction = mo.moonGeocentricDiskIlluminatedFraction(sunsetJD, deltaT);
 
-    const moonGeocentricBrightLimbAngle = mo
-        .moonGeocentricBrightLimbAngle(sunsetJD, deltaT);
+    const moonGeocentricBrightLimbAngle = mo.moonGeocentricBrightLimbAngle(sunsetJD, deltaT);
 
     //Data Bulan Toposentris
     const moonTopocentricLongitudeApparent = mo.moonTopocentricLongitude(
@@ -416,8 +401,7 @@ class HisabAwalBulanService {
       elev,
     );
 
-    const moonTopocentricRightAscension = mo
-        .moonTopocentricRightAscension(sunsetJD, deltaT, gLon, gLat, elev);
+    const moonTopocentricRightAscension = mo.moonTopocentricRightAscension(sunsetJD, deltaT, gLon, gLat, elev);
 
     const moonTopocentricDeclination = mo.moonTopocentricDeclination(
       sunsetJD,
@@ -427,11 +411,9 @@ class HisabAwalBulanService {
       elev,
     );
 
-    const moonTopocentricGreenwichHourAngle = mo
-        .moonTopocentricGreenwichHourAngle(sunsetJD, deltaT, gLon, gLat, elev);
+    const moonTopocentricGreenwichHourAngle = mo.moonTopocentricGreenwichHourAngle(sunsetJD, deltaT, gLon, gLat, elev);
 
-    const moonTopocentricLocalHourAngle = mo
-        .moonTopocentricLocalHourAngel(sunsetJD, deltaT, gLon, gLat, elev);
+    const moonTopocentricLocalHourAngle = mo.moonTopocentricLocalHourAngel(sunsetJD, deltaT, gLon, gLat, elev);
 
     const moonTopocentricSemidiameter = mo.moonTopocentricSemidiameter(
       sunsetJD,
@@ -448,16 +430,14 @@ class HisabAwalBulanService {
       gLat,
       elev,
     );
-    const moonTopocentricDiskIlluminatedFraction = mo
-        .moonTopocentricDiskIlluminatedFraction(
+    const moonTopocentricDiskIlluminatedFraction = mo.moonTopocentricDiskIlluminatedFraction(
           sunsetJD,
           deltaT,
           gLon,
           gLat,
           elev,
         );
-    const moonTopocentricBrightLimbAngle = mo
-        .moonTopocentricBrightLimbAngle(sunsetJD, deltaT, gLon, gLat, elev);
+    const moonTopocentricBrightLimbAngle = mo.moonTopocentricBrightLimbAngle(sunsetJD, deltaT, gLon, gLat, elev);
 
     const moonTopocentricAzimuth = mo.moonTopocentricAzimuth(
       sunsetJD,
@@ -467,8 +447,7 @@ class HisabAwalBulanService {
       elev,
     );
 
-    const moonTopocentricAltitudeAirlessUpper = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeAirlessUpper = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -479,8 +458,7 @@ class HisabAwalBulanService {
           "htu",
         );
 
-    const moonTopocentricAltitudeAirlessCenter = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeAirlessCenter = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -491,8 +469,7 @@ class HisabAwalBulanService {
           "htc",
         );
 
-    const moonTopocentricAltitudeAirlessLower = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeAirlessLower = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -503,8 +480,7 @@ class HisabAwalBulanService {
           "htl",
         );
 
-    const moonTopocentricAltitudeApparentsUpper = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeApparentsUpper = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -515,8 +491,7 @@ class HisabAwalBulanService {
           "htau",
         );
 
-    const moonTopocentricAltitudeApparentCenter = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeApparentCenter = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -527,8 +502,7 @@ class HisabAwalBulanService {
           "htac",
         );
 
-    const moonTopocentricAltitudeApparentLower = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeApparentLower = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -539,8 +513,7 @@ class HisabAwalBulanService {
           "htal",
         );
 
-    const moonTopocentricAltitudeObserveredUpper = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeObserveredUpper = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -551,8 +524,7 @@ class HisabAwalBulanService {
           "htou",
         );
 
-    const moonTopocentricAltitudeObserveredCenter = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeObserveredCenter = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,
@@ -563,8 +535,7 @@ class HisabAwalBulanService {
           "htoc",
         );
 
-    const moonTopocentricAltitudeObserveredLower = mo
-        .moonTopocentricAltitude(
+    const moonTopocentricAltitudeObserveredLower = mo.moonTopocentricAltitude(
           sunsetJD,
           deltaT,
           gLon,

@@ -335,9 +335,7 @@ class CalendarService {
     const jdTarget = this._jdToCJDN(jd);
 
     const thnH =  parseInt(
-      this.julDay
-          .cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"})
-          .toString(),
+      this.julDay.cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"}).toString(),
     );
 
     const abqList = [];
@@ -383,9 +381,7 @@ class CalendarService {
     const jdTarget = this._jdToCJDN(jd);
 
     const thnH =  parseInt(
-      this.julDay
-          .cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"})
-          .toString(),
+      this.julDay.cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"}).toString(),
     );
 
     const abqList = [];
@@ -427,9 +423,7 @@ class CalendarService {
     const jdTarget = this._jdToCJDN(jd);
 
     const thnH =  parseInt(
-      this.julDay
-          .cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"})
-          .toString(),
+      this.julDay.cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"}).toString(),
     );
 
     const abqList = [];
@@ -471,9 +465,7 @@ class CalendarService {
     const jdTarget = this._jdToCJDN(jd);
 
     const thnH =  parseInt(
-      this.julDay
-          .cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"})
-          .toString(),
+      this.julDay.cjdnkh(this._jdToCJDN(jd),{hCalE: 2,hCalL: 2,optResult: "THNH"}).toString(),
     );
 
     const abqList = [];

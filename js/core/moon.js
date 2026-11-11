@@ -765,14 +765,12 @@ class MoonFunction {
         break;
       case 2:
         k =
-            ((hijriMonth) + 12 * (hijriYear) - 17049.5)
-                Math.floor(Math) +
+            Math.floor(((hijriMonth) + 12 * (hijriYear) - 17049.5)) +
             0.5;
         break;
       default:
         k =
-            ((hijriMonth) + 12 * (hijriYear) - 17048.5)
-                Math.floor(Math) +
+            Math.floor(((hijriMonth) + 12 * (hijriYear) - 17048.5)) +
             0.0;
         break;
     }

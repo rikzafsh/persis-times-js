@@ -16,7 +16,8 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | 3. Layanan | `js/services/calendar_service.js`, `salat_service.js` | Kalender Hijriah, jadwal salat harian |
 | | `js/services/hisab_awal_bulan_service.js` | Hisab awal bulan: ijtimak, Magrib, data hilal, status MABIMS/Turki/WH |
 | | `js/services/peta_visibilitas_service.js` | Visibilitas hilal per lokasi: Odeh, Yallop, SAAO, Maunder, Bruin |
-| 4. Antarmuka | `js/app/app.js`, `app_hisab.js`, `css/style.css` | Satu-satunya bagian yang menyentuh DOM |
+| | `js/services/lunar_eclipse_service.js`, `solar_eclipse_service.js` | Gerhana Bulan/Matahari: Besselian, kontak, magnitudo, global, lokal, rentang tahun H |
+| 4. Antarmuka | `js/app/app.js`, `app_hisab.js`, `app_gerhana.js`, `css/style.css` | Satu-satunya bagian yang menyentuh DOM |
 
 Urutan `<script>` di `index.html` penting: data → inti → layanan → antarmuka.
 
@@ -40,7 +41,18 @@ peta.hitung({blnH:10,thnH:1447,gLon:-74,gLat:40.7,tmZn:-5,tbhHari:1,jdIjtimak:pr
 `blnH` = bulan Hijriah yang awalnya dihisab (10 = Syawwal). `tbhHari` menggeser hari Magrib dari tanggal lokal ijtimak.
 Peta dunia di antarmuka memakai Magrib pertama setelah ijtimak (opsi bisa diganti).
 
+## Gerhana
+```js
+const S = new SolarEclipseService(), L = new LunarEclipseService();
+S.solarEclipseGlobal({blnH:2, thnH:1448});     // 12 Agt 2026: Sentral Total, magnitudo 1,0386, durasi 2m18s
+S.solarEclipseLocal({blnH:2, thnH:1448, gLon:-0.88, gLat:41.65, elev:200, pres:1010, temp:20, tmZn:2});
+L.lunarEclipseGlobal({blnH:9, thnH:1447});     // 3 Mar 2026: Gerhana Bulan Total
+S.solarEclipseGlobalRangeHijri({tahunAwalH:1448, tahunAkhirH:1449, timeScale:TimeScale.jdUT});
+```
+`blnH` = bulan Hijriah yang awalnya ditandai ijtimak/oposisi gerhana itu (Matahari: ijtimak; Bulan: purnama).
+Pustaka asli menghitung keadaan geometris lokal meski Matahari/Bulan di bawah ufuk (`altMx < 0`); antarmuka menandainya "tidak teramati".
+
 ## Belum diport
-Gerhana Matahari/Bulan dan rashdulqiblat.
+Rashdulqiblat dan antipoda Ka'bah.
 
 Lisensi: lihat `LICENSE-persis_times.txt` (hak cipta asli abusabda, MIT).

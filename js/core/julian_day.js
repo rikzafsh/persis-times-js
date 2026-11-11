@@ -317,8 +317,7 @@ class JulianDay {
     const hCalDN = cjdn - dltD;
     const x2 = Math.floor(((30 * hCalDN + 29 - lyCor) / 10631));
     const r2 = this.mf.mod(30 * hCalDN + 29 - lyCor, 10631.0);
-    const x1 = ((11 * Math.floor((r2 / 30)) + 5) / 325)
-        Math.floor(Math);
+    const x1 = Math.floor(((11 * Math.floor((r2 / 30)) + 5) / 325));
     const r1 = this.mf.mod(11 * Math.floor((r2 / 30)) + 5, 325.0);
 
     const hCalD = Math.floor((r1 / 11)) + 1;
@@ -378,8 +377,7 @@ class JulianDay {
     const hCalDN = cjdn - dltD;
     const x2 = Math.floor(((30.0 * hCalDN + 29.0 - lyCor) / 10631));
     const r2 = this.mf.mod(30 * hCalDN + 29 - lyCor, 10631);
-    const x1 = ((11 * Math.floor((r2 / 30)) + 5) / 325)
-        Math.floor(Math);
+    const x1 = Math.floor(((11 * Math.floor((r2 / 30)) + 5) / 325));
     const r1 = this.mf.mod(11 * Math.floor((r2 / 30)) + 5, 325);
 
     const hCalD = Math.floor((r1 / 11)) + 1;
