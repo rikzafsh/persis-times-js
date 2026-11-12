@@ -18,6 +18,7 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | | `js/services/peta_visibilitas_service.js` | Visibilitas hilal per lokasi: Odeh, Yallop, SAAO, Maunder, Bruin |
 | | `js/services/lunar_eclipse_service.js`, `solar_eclipse_service.js` | Gerhana Bulan/Matahari: Besselian, kontak, magnitudo, global, lokal, rentang tahun H |
 | | `js/services/astro_events_service.js` | **Tambahan** (bukan dari Dart): fase Bulan, solstis/ekuinoks, tithi |
+| | `js/services/panchanga_service.js` | **Tambahan**: pañcāṅga lengkap — nakṣatra, yoga, karaṇa, māsa, śakavarṣa, lagna-rāśi, muhūrta (ayanāṃśa Lahiri) |
 | 4. Antarmuka | `js/app/ui.js` | Kerangka: formulir lokasi, sistem tab, pemformat |
 | | `js/app/tab_*.js`, `main.js`, `css/style.css` | Satu berkas per tab: salat, posisi, fase, musim, tithi, hilal (+peta), gerhana |
 
@@ -57,6 +58,22 @@ A.moonState(jd);                    // {elongasi, iluminasi(%), umur(hari), jara
 Validasi: musim 2026 dan fase Maret 2026 cocok dengan USNO sampai menit (ekuinoks 20 Mar 14:45:53 UT, solstis 21 Jun 08:24:25 UT;
 purnama 3 Mar 11:37:50 UT, bulan baru 19 Mar 01:23:25 UT); bulan baru Meeus 1977 selisih ±3 detik. Tithi n berlangsung saat elongasi
 12°·(n−1) → 12°·n; Purnima berakhir tepat saat purnama.
+
+## Pañcāṅga (tambahan)
+```js
+const P = new Panchanga();                    // memakai AstroEvents di dalamnya
+P.tithi(jd); P.nakshatra(jd); P.yoga(jd); P.karana(jd);   // {n, nama, awal, akhir, bagian, (pada | paksha)}
+P.masa(jd);                                   // {nama, adhika, namaPurnimanta, paksha, awal, akhir}  (skema amānta)
+P.sakaYear(masa.idx, bulanMasehi, tahunMasehi);           // tahun Śaka
+P.lagna(jd, lat, lon); P.lagnaSpans(jd, lat, lon, 24);    // ascendant sidereal & jam tiap lagna-rāśi
+P.muhurta(jdTerbit, jdTerbenam, jdTerbitBerikutnya, vara);// Brahma, Abhijit, Rāhu, Yamagaṇḍa, Gulika + 30 muhūrta
+P.sidSun(jd); P.sidMoon(jd); P.ayanamsa(jd);  // zodiak sidereal
+```
+Definisi: nakṣatra = bujur sidereal Bulan / 13°20′ (27); yoga = (bujur sidereal Matahari + Bulan) / 13°20′; karaṇa = elongasi / 6° (60 per bulan:
+Kiṃstughna, 7 karaṇa bergerak × 8, lalu Śakuni, Catuṣpada, Nāga); māsa amānta dinamai rāśi sidereal Matahari saat bulan baru (+1), tanpa saṅkrānti = adhika;
+Śaka bertambah di Caitra Śukla Pratipadā. Validasi: ayanāṃśa Lahiri J2000 = 23,8571°; Śaka 1948 mulai 19 Mar 2026; Adhika Jyeṣṭha 17 Mei–15 Jun 2026
+terdeteksi; Diwali 8 Nov 2026 = Āśvina Kṛṣṇa Amāvāsyā; lagna saat terbit mendekati bujur Matahari.
+Tradisi regional bisa berbeda dalam detail (mis. aturan hari perayaan, vāra muhūrta); anggap ini hitungan astronomis, bukan panchang resmi.
 
 ## Gerhana
 ```js
