@@ -1,7 +1,7 @@
-:root{--bg:#f4f5f1;--fg:#1b2420;--mut:#5d6a63;--card:#fff;--line:#dfe2da;--ac:#17694c;--ac-fg:#fff;--ac2:#e6f2ec;--warn:#9a5b00;--warn2:#fff3dc;
+:root{--bg:#f4f5f1;--fg:#1b2420;--mut:#5d6a63;--card:#fff;--line:#dfe2da;--ac:#17694c;--ac-fg:#fff;--ac2:#e6f2ec;--warn:#9a5b00;--warn2:#fff3dc;--bad:#c0392b;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--fg:#e7ece9;--mut:#9aa9a0;--card:#1b231f;--line:#2e3933;--ac:#5fc79b;--ac-fg:#0d1a14;--ac2:#1e2f27;--warn:#f0b955;--warn2:#33290f;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#121815;--fg:#e7ece9;--mut:#9aa9a0;--card:#1b231f;--line:#2e3933;--ac:#5fc79b;--ac-fg:#0d1a14;--ac2:#1e2f27;--warn:#f0b955;--warn2:#33290f;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--fg:#e7ece9;--mut:#9aa9a0;--card:#1b231f;--line:#2e3933;--ac:#5fc79b;--ac-fg:#0d1a14;--ac2:#1e2f27;--warn:#f0b955;--warn2:#33290f;--bad:#ff8a7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121815;--fg:#e7ece9;--mut:#9aa9a0;--card:#1b231f;--line:#2e3933;--ac:#5fc79b;--ac-fg:#0d1a14;--ac2:#1e2f27;--warn:#f0b955;--warn2:#33290f;--bad:#ff8a7a;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -37,3 +37,6 @@ tr.hl td{background:var(--ac2)}tr.hl td:first-child{border-radius:8px 0 0 8px}tr
 .split{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
 footer{color:var(--mut);font-size:12px;padding:10px 0 20px}
 @media (max-width:520px){.hero .in{padding-top:16px}h1{font-size:20px}.big{font-size:22px}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}.kpi{background:var(--ac2);border-radius:12px;padding:10px 12px}.kpi b{display:block;font-size:24px;letter-spacing:-.01em;color:var(--ac)}.kpi span{font-size:12px;color:var(--mut)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:14px 0}.charts .card{margin:0}
+ul.find{padding-left:18px;margin:6px 0}ul.find li{margin:7px 0}

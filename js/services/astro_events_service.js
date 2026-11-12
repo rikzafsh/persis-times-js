@@ -14,8 +14,8 @@ class AstroEvents {
   moonLon(jd) { return this.mn.ml.moonGeocentricLongitude(jd, this.dt.deltaT(jd), "Appa"); }
   /** Elongasi Bulan terhadap Matahari, 0–360° (0 = bulan baru, 180 = purnama). */
   elongation(jd) { return (((this.moonLon(jd) - this.sunLon(jd)) % 360) + 360) % 360; }
-  _solve(f, jd, rate) {                                   // Newton dengan laju rata-rata (°/hari)
-    for (let i = 0; i < 12; i++) { const d = f(jd) / rate; jd -= d; if (Math.abs(d) < 1e-7) break; }
+  _solve(f, jd, rate, tol = 1e-7) {                       // Newton dengan laju rata-rata (°/hari)
+    for (let i = 0; i < 12; i++) { const d = f(jd) / rate; jd -= d; if (Math.abs(d) < tol) break; }
     return jd;
   }
 
@@ -26,6 +26,12 @@ class AstroEvents {
     const jd0 = 2451550.09766 + 29.530588861 * k;
     const jd = this._solve(j => this._n180(this.elongation(j) - target), jd0, 12.19);
     return { jd, fase: q, nama: FASE_NAMA[q] };
+  }
+  /** Bulan baru ke-k (JD UT), tebakan awal dengan dua suku koreksi Meeus; tol = ketelitian (hari), 1e-5 ≈ 1 detik. */
+  newMoon(k, tol = 1e-5) {
+    const r = Math.PI / 180, M = (2.5534 + 29.1053567 * k) * r, Mp = (201.5643 + 385.81693528 * k) * r;
+    const jd0 = 2451550.09766 + 29.530588861 * k - 0.4072 * Math.sin(Mp) + 0.17241 * Math.sin(M);
+    return this._solve(j => this._n180(this.elongation(j)), jd0, 12.19, tol);
   }
   /** Semua fase pada rentang [jdAwal, jdAkhir] (UT), terurut. */
   phasesBetween(jdAwal, jdAkhir) {

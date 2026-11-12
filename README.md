@@ -20,6 +20,7 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | | `js/services/astro_events_service.js` | **Tambahan** (bukan dari Dart): fase Bulan, solstis/ekuinoks, tithi |
 | | `js/services/panchanga_service.js` | **Tambahan**: pañcāṅga lengkap — nakṣatra, yoga, karaṇa, māsa, śakavarṣa, lagna-rāśi, muhūrta (ayanāṃśa Lahiri) |
 | 4. Antarmuka | `js/app/ui.js` | Kerangka: formulir lokasi, sistem tab, pemformat |
+| | `js/app/charts.js` | Grafik SVG kecil (batang, linimasa), mengikuti tema |
 | | `js/app/tab_*.js`, `main.js`, `css/style.css` | Satu berkas per tab: salat, posisi, fase, musim, tithi, hilal (+peta), gerhana |
 
 Urutan `<script>` di `index.html` penting: data → inti → layanan → antarmuka.
@@ -73,6 +74,15 @@ Definisi: nakṣatra = bujur sidereal Bulan / 13°20′ (27); yoga = (bujur side
 Kiṃstughna, 7 karaṇa bergerak × 8, lalu Śakuni, Catuṣpada, Nāga); māsa amānta dinamai rāśi sidereal Matahari saat bulan baru (+1), tanpa saṅkrānti = adhika;
 Śaka bertambah di Caitra Śukla Pratipadā. Validasi: ayanāṃśa Lahiri J2000 = 23,8571°; Śaka 1948 mulai 19 Mar 2026; Adhika Jyeṣṭha 17 Mei–15 Jun 2026
 terdeteksi; Diwali 8 Nov 2026 = Āśvina Kṛṣṇa Amāvāsyā; lagna saat terbit mendekati bujur Matahari.
+
+Pencarian adhika/kṣaya māsa pada rentang tahun:
+```js
+const P = new Panchanga();
+const hasil = P.cariAdhikaKsaya(2000, 2100);  // {bulan, adhika:[...], ksaya:[...]}  (±2,6 ms per bulan lunar)
+for (const m of P.lunarMonths(jdAwal, jdAkhir)) { /* generator: {awal, akhir, lama, idx, nama, jenis:'normal'|'adhika'|'ksaya', hilang, sankranti} */ }
+```
+Validasi: adhika 2001 Āśvina, 2004 Śrāvaṇa, 2007 Jyeṣṭha, 2010 Vaiśākha, 2012 Bhādrapada, 2015 Āṣāḍha, 2018 Jyeṣṭha, 2020 Āśvina, 2023 Śrāvaṇa, 2026 Jyeṣṭha;
+kṣaya 1963 (Mārgaśīrṣa), 1983 (Māgha), 2123–24 (Pauṣa). Tab antarmuka: linimasa, frekuensi per māsa, selang antar adhika, kurun, siklus Metonik (`charts.js`, SVG tanpa pustaka luar).
 Tradisi regional bisa berbeda dalam detail (mis. aturan hari perayaan, vāra muhūrta); anggap ini hitungan astronomis, bukan panchang resmi.
 
 ## Gerhana

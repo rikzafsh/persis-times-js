@@ -122,4 +122,29 @@ class Panchanga {
       lamaSiang: dayLen * 24, lamaMalam: nightLen * 24, siang, malam,
     };
   }
+
+  // ───────── Pencarian adhika & kṣaya māsa ─────────
+  /**
+   * Generator bulan lunar (bulan baru → bulan baru) yang bulan barunya jatuh di [jdAwal, jdAkhir].
+   * jenis: "adhika" (tanpa saṅkrānti), "ksaya" (dua saṅkrānti), atau "normal".
+   */
+  *lunarMonths(jdAwal, jdAkhir) {
+    const A = this.A;
+    let k = Math.floor((jdAwal - 2451550.09766) / 29.530588861) - 1, a = A.newMoon(k);
+    while (a < jdAwal) { k++; a = A.newMoon(k); }
+    for (; a <= jdAkhir; k++) {
+      const b = A.newMoon(k + 1), r1 = Math.floor(this.sidSun(a) / 30), r2 = Math.floor(this.sidSun(b) / 30), d = (r2 - r1 + 12) % 12, idx = (r1 + 1) % 12;
+      yield { k, awal: a, akhir: b, lama: b - a, r1, r2, idx, nama: PN.MASA[idx], jenis: d === 0 ? "adhika" : d === 2 ? "ksaya" : "normal",
+              hilang: d === 2 ? PN.MASA[(idx + 1) % 12] : null, sankranti: d === 2 ? [PN.RASI[(r1 + 1) % 12], PN.RASI[(r1 + 2) % 12]] : null };
+      a = b;
+    }
+  }
+  /** Cari semua adhika & kṣaya māsa untuk tahun Masehi tahunAwal..tahunAkhir (sinkron; untuk rentang besar pakai generator). */
+  cariAdhikaKsaya(tahunAwal, tahunAkhir) {
+    const J = this.A.jd, out = { bulan: 0, adhika: [], ksaya: [] };
+    for (const m of this.lunarMonths(J.kmjd(1, 1, tahunAwal, 0, 0), J.kmjd(1, 1, tahunAkhir + 1, 0, 0))) {
+      out.bulan++; if (m.jenis === "adhika") out.adhika.push(m); else if (m.jenis === "ksaya") out.ksaya.push(m);
+    }
+    return out;
+  }
 }
