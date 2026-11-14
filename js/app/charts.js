@@ -47,5 +47,15 @@ const Charts = (() => {
     });
     return svg(h, s, o.title || "linimasa");
   }
-  return { bar, timeline, nice };
+  /** points[{x,y,c}] (c = indeks warna), y dalam jam desimal; xticks[{x,label}] */
+  function scatter(o) {
+    const h = 300, L = 48, R = 14, T = 14, B = 34, iw = W - L - R, ih = h - T - B, X = x => L + (x - o.x0) / (o.x1 - o.x0) * iw, Y = y => T + (1 - (y - o.y0) / (o.y1 - o.y0)) * ih;
+    const col = o.colors || ["var(--ac)", "var(--bad)"];
+    let s = "";
+    for (let y = Math.ceil(o.y0); y <= o.y1; y += (o.y1 - o.y0 > 12 ? 2 : 1)) s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + Y(y) + "' y2='" + Y(y) + "' stroke='var(--line)'/>" + txt(L - 6, Y(y) + 4, String(y).padStart(2, "0") + ":00", { a: "end", s: 10 });
+    (o.xticks || []).forEach(t => { s += "<line x1='" + X(t.x) + "' x2='" + X(t.x) + "' y1='" + T + "' y2='" + (T + ih) + "' stroke='var(--line)' stroke-dasharray='2 3'/>" + txt(X(t.x), T + ih + 16, t.label, { s: 10 }); });
+    o.points.forEach(p => { s += "<circle cx='" + X(p.x).toFixed(1) + "' cy='" + Y(p.y).toFixed(1) + "' r='1.9' fill='" + col[p.c] + "'><title>" + esc(p.tip || "") + "</title></circle>"; });
+    return svg(h, s, o.title || "sebaran waktu");
+  }
+  return { bar, timeline, scatter, nice };
 })();

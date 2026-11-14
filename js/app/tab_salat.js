@@ -1,6 +1,6 @@
 /** tab_salat.js — Tab "Waktu Salat": jadwal harian (SalatService) + arah kiblat (ArahKiblat). */
 (function () {
-  const { $, rows, card, hm, dms } = UI;
+  const { $, rows, card, hm, hms, sgn, dms } = UI;
   const p = UI.add({ id: "salat", label: "Waktu Salat", icon: "🕌" });
   const NAMA = [["Subuh","subuh"],["Syuruk","syuruk"],["Duha","duha"],["Zuhur","zuhur"],["Asar","asar"],["Magrib","magrib"],["Isya","isya"],["Nisfu lail","nisfuLail"]];
   const kompas = b => "<svg viewBox='-60 -60 120 120' width='112' height='112' role='img' aria-label='Arah kiblat " + b.toFixed(1) + "°'>" +
@@ -10,10 +10,18 @@
     const L = UI.L(), I = L.iht;
     const r = new SalatService().waktuSalatHarian({ tglM: L.d, blnM: L.mo, thnM: L.y, gLon: L.lon, gLat: L.lat, elev: L.elev, tmZn: L.tz, prayerMethod: L.method,
       ihtySubuh: I, ihtySyuruk: I, ihtyZuhur: I, ihtyAsar: I, ihtyMagrib: I, ihtyIsya: I });
+    const WP = new WaktuPelengkap(), is = WP.istiwa(L.d, L.mo, L.y, L.lon, L.lat, L.tz), ml = WP.sepertigaMalam(L.d, L.mo, L.y, L.lon, L.lat, L.elev, L.tz, L.method);
+    const lamaMalam = ml ? Math.floor(ml.lama) + " j " + Math.round((ml.lama % 1) * 60) + " m" : "—";
+    const pel = card("Istiwa, tafawut &amp; sepertiga malam", rows([
+      ["Istiwa (Matahari berkulminasi)", "<b>" + hms(is.jam) + "</b>"], ["Tinggi Matahari saat istiwa", is.tinggi.toFixed(2) + "°"],
+      ["Tafawut (perata waktu, e)", sgn(is.tafawut)], ["Koreksi waktu daerah (KWD)", sgn(is.kwd)],
+      ["Lama malam (Magrib → Subuh)", lamaMalam], ["Akhir sepertiga malam pertama", ml ? hms(ml.akhirSepertigaPertama) : "—"],
+      ["Tengah malam (nisfu lail)", ml ? hms(ml.tengahMalam) : "—"], ["Awal sepertiga malam terakhir", ml ? hms(ml.awalSepertigaTerakhir) : "—"]]),
+      "Istiwa = 12 − e − KWD (zuhur tanpa ihtiyat). Tafawut = selisih waktu hakiki terhadap waktu pertengahan (e), positif bila Matahari lebih cepat. Malam dihitung Magrib → Subuh menurut metode " + L.method.name + ".");
     const ak = new ArahKiblat(), bs = ak.arahQiblatSpherical(L.lon, L.lat), bv = ak.arahQiblaVincenty(L.lon, L.lat, "PtoQ");
     p.innerHTML =
       card("Jadwal salat <small>(" + L.method.name + ", zona " + L.tz + ")</small>", "<table class='kv'>" + NAMA.map(([l, k]) => "<tr><td>" + l + "</td><td class='big'>" + (r[k].isNormal ? hm(r[k].time) : "<small>(" + r[k].status + ")</small>") + "</td></tr>").join("") + "</table>",
-        "Ihtiyat " + I + " menit. Waktu dibulatkan ke menit seperti pada pustaka asli.") +
+        "Ihtiyat " + I + " menit. Waktu dibulatkan ke menit seperti pada pustaka asli.") + pel +
       "<div class='card'><h2>Arah kiblat</h2><div class='split'><div class='wrap'>" + rows([["Bola (spherical)", dms(bs)], ["Koreksi elipsoid", dms(ak.arahQiblaWithEllipsoidCorrection(L.lon, L.lat))], ["Vincenty", dms(bv)], ["Jarak (Vincenty)", (ak.arahQiblaVincenty(L.lon, L.lat, "Dist") / 1000).toFixed(1) + " km"]]) + "</div>" + kompas(bv) + "</div><p class='note'>Dihitung dari utara sejati searah jarum jam.</p></div>";
   });
 })();

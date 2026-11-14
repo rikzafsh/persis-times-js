@@ -17,6 +17,10 @@ const UI = (() => {
   }
   const hm = h => { if (h == null) return "—"; let t = Math.round(h * 3600); t = ((t % 86400) + 86400) % 86400; return pad(Math.floor(t / 3600)) + ":" + pad(Math.floor(t % 3600 / 60)); };
   const dms = x => { const s = x < 0 ? "−" : ""; x = Math.abs(x); const d = Math.floor(x), m = Math.floor((x - d) * 60), sc = ((x - d) * 60 - m) * 60; return s + d + "° " + pad(m) + "′ " + sc.toFixed(1).padStart(4, "0") + "″"; };
+  /** jam desimal → hh:mm:ss */
+  const hms = h => { if (h == null || Number.isNaN(h)) return "—"; let t = Math.round(h * 3600); t = ((t % 86400) + 86400) % 86400; return pad(Math.floor(t / 3600)) + ":" + pad(Math.floor(t % 3600 / 60)) + ":" + pad(t % 60); };
+  /** jam desimal → "+15 m 54 d" (bertanda, menit & detik) */
+  const sgn = h => { const s = Math.round(Math.abs(h) * 3600); return (h < 0 ? "−" : "+") + Math.floor(s / 60) + " m " + (s % 60) + " d"; };
   const rows = a => "<table class='kv'>" + a.map(r => "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>").join("") + "</table>";
   const card = (t, b, extra) => "<div class='card'><h2>" + t + "</h2><div class='wrap'>" + b + "</div>" + (extra ? "<p class='note'>" + extra + "</p>" : "") + "</div>";
   const err = e => "<div class='card'><span class='tag warn'>Galat</span> " + (e && e.message || e) + "</div>";
@@ -64,5 +68,5 @@ const UI = (() => {
     let h = ""; try { h = location.hash.slice(1); } catch (e) {}
     show(h);
   }
-  return { $, pad, CITIES, L, hm, dms, rows, card, err, fmtDT, fmtD, faseNama, add, onRender, show, refresh, start };
+  return { $, pad, CITIES, L, hm, hms, sgn, dms, rows, card, err, fmtDT, fmtD, faseNama, add, onRender, show, refresh, start };
 })();

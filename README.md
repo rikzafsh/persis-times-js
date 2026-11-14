@@ -18,6 +18,7 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | | `js/services/peta_visibilitas_service.js` | Visibilitas hilal per lokasi: Odeh, Yallop, SAAO, Maunder, Bruin |
 | | `js/services/lunar_eclipse_service.js`, `solar_eclipse_service.js` | Gerhana Bulan/Matahari: Besselian, kontak, magnitudo, global, lokal, rentang tahun H |
 | | `js/services/astro_events_service.js` | **Tambahan** (bukan dari Dart): fase Bulan, solstis/ekuinoks, tithi |
+| | `js/services/pelengkap_service.js` | **Tambahan**: waktu istiwa, tafawut (perata waktu), sepertiga malam, rasydulqiblat harian |
 | | `js/services/panchanga_service.js` | **Tambahan**: pañcāṅga lengkap — nakṣatra, yoga, karaṇa, māsa, śakavarṣa, lagna-rāśi, muhūrta (ayanāṃśa Lahiri) |
 | 4. Antarmuka | `js/app/ui.js` | Kerangka: formulir lokasi, sistem tab, pemformat |
 | | `js/app/charts.js` | Grafik SVG kecil (batang, linimasa), mengikuti tema |
@@ -96,7 +97,28 @@ S.solarEclipseGlobalRangeHijri({tahunAwalH:1448, tahunAkhirH:1449, timeScale:Tim
 `blnH` = bulan Hijriah yang awalnya ditandai ijtimak/oposisi gerhana itu (Matahari: ijtimak; Bulan: purnama).
 Pustaka asli menghitung keadaan geometris lokal meski Matahari/Bulan di bawah ufuk (`altMx < 0`); antarmuka menandainya "tidak teramati".
 
+## Waktu pelengkap salat & rasydulqiblat (tambahan + pustaka)
+```js
+const W = new WaktuPelengkap();
+W.istiwa(10, 11, 2026, 110.3695, -7.7956, 7);      // {jam, tafawut(jam), kwd(jam), deklinasi, tinggi}  istiwa = zuhur mentah (12 − e − KWD)
+W.sepertigaMalam(10, 11, 2026, lon, lat, elev, 7, PrayerMethod.persatuanIslam); // {magrib, subuh, lama, akhirSepertigaPertama, tengahMalam, awalSepertigaTerakhir}
+
+const R = new RasydulHarian(), Q = new ArahKiblat().arahQiblatSpherical(lon, lat);
+R.hari(12, 11, 2026, lat, lon, 7, Q);               // [{jenis:0|1, jam, tinggi, azimut}]  0 = Matahari di arah kiblat, 1 = bayangan menuju kiblat
+R.sunAltAz(jd, lat, lon);                           // {tinggi, azimut} Matahari geosentris
+
+const ak = new ArahKiblat();                        // dari pustaka Dart (sudah ikut diport):
+ak.rashdulQiblat(2026, 7, 1);                       // {jd, jamDes, tinggi, deklinasi}  opt 1 = Rasydul 1 (±28 Mei), 2 = Rasydul 2 (±15 Juli)
+ak.antipodaKabah(2026, 7, 1);                       // Matahari di nadir Ka'bah
+ak.rashdulQiblatBulan(2026, 7);                     // Bulan di zenit Ka'bah (daftar)
+```
+Rasydulqiblat harian: syarat azimut Matahari = Q (atau Q+180°) berbentuk a·cosH + b·sinH = c dengan a = sinφ·sinQ·cosδ, b = −cosQ·cosδ, c = sinQ·cosφ·sinδ.
+Ada dua akar sudut jam; tiap akar diiterasi sendiri, jenisnya ditentukan dari tanda hasil kali titik, dan hanya yang Matahari-nya di atas ufuk dikembalikan.
+Jam yang dekat zenit (tinggi > 85°) azimutnya tidak pasti. Uji silang terhadap `sunAltAz` pada 655 peristiwa di 7 lokasi: simpangan azimut < 0,05° kecuali saat Matahari < 0,4° dari zenit.
+Tafawut: pustaka Dart tidak memuatnya; di sini diartikan perata waktu (e) = selisih waktu hakiki (istiwa) terhadap waktu pertengahan ("daqāiq al-tafāwut" pada tabel falak klasik).
+Jika yang dimaksud berbeda, ubah baris "Tafawut" pada `js/app/tab_salat.js`. Perata waktu pustaka cocok dengan transit berbasis asensio rekta sampai 0,2 detik.
+
 ## Belum diport
-Rashdulqiblat dan antipoda Ka'bah.
+Pembungkus `qibla_service.dart` (rentang tahun) tidak diport; fungsinya tersedia langsung lewat `ArahKiblat`.
 
 Lisensi: lihat `LICENSE-persis_times.txt` (hak cipta asli abusabda, MIT).
