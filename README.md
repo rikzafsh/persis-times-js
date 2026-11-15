@@ -72,6 +72,12 @@ P.lagna(jd, lat, lon); P.lagnaSpans(jd, lat, lon, 24);    // ascendant sidereal 
 P.muhurta(jdTerbit, jdTerbenam, jdTerbitBerikutnya, vara);// Brahma, Abhijit, Rāhu, Yamagaṇḍa, Gulika + 30 muhūrta
 P.sidSun(jd); P.sidMoon(jd); P.ayanamsa(jd);  // zodiak sidereal
 ```
+Grafik harian 24 jam (tab Tithi & Pañcāṅga, `Charts.dayline`): garis waktu terbit → terbit berikutnya dengan baris Tithi, Nakṣatra, Yoga, Karaṇa, Vāra (+ Caughaḍiyā buruk),
+dan (mode lengkap) Lagna, Caughaḍiyā, Kāla (Rāhu, Yamagaṇḍa, Gulika), serta Brahma/Abhijit muhūrta. Mesin: `Panchanga.rangkaian('tithi'|'nakshatra'|'yoga'|'karana', jdAwal, jdAkhir)` dan
+`Panchanga.caughadiya(sr, ss, sr2, vara)` (siklus siang Udvega-Cara-Lābha-Amṛta-Kāla-Śubha-Roga mulai indeks 3·vāra; malam Śubha-Amṛta-Cara-Roga-Kāla-Lābha-Udvega mulai 2·vāra).
+Validasi terhadap contoh Drik Panchang (New Delhi, Minggu 15 Nov 2026): Tithi Ṣaṣṭhī → Saptamī berakhir 02:02 (contoh 02:00), Nakṣatra Uttarāṣāḍhā → Śravaṇa 23:29 (23:28),
+Karaṇa Kaulava 12:44 (12:43) → Taitila 02:02 → Gara, Yoga Gaṇḍa sepanjang jendela, dan seluruh Caughaḍiyā buruk cocok. Kota "New Delhi" tersedia di daftar kota.
+
 Definisi: nakṣatra = bujur sidereal Bulan / 13°20′ (27); yoga = (bujur sidereal Matahari + Bulan) / 13°20′; karaṇa = elongasi / 6° (60 per bulan:
 Kiṃstughna, 7 karaṇa bergerak × 8, lalu Śakuni, Catuṣpada, Nāga); māsa amānta dinamai rāśi sidereal Matahari saat bulan baru (+1), tanpa saṅkrānti = adhika;
 Śaka bertambah di Caitra Śukla Pratipadā. Validasi: ayanāṃśa Lahiri J2000 = 23,8571°; Śaka 1948 mulai 19 Mar 2026; Adhika Jyeṣṭha 17 Mei–15 Jun 2026

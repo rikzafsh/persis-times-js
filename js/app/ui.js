@@ -7,7 +7,7 @@ const UI = (() => {
   const $ = id => document.getElementById(id);
   const pad = n => String(n).padStart(2, "0");
   const CITIES = { "Yogyakarta":[-7.7956,110.3695,7,100], "Jakarta":[-6.2088,106.8456,7,8], "Bandung":[-6.9175,107.6191,7,768], "Surabaya":[-7.2575,112.7521,7,5],
-    "Makassar":[-5.1477,119.4327,8,10], "Jayapura":[-2.5337,140.7181,9,5], "Makkah":[21.4225,39.8262,3,300], "Kuala Lumpur":[3.139,101.6869,8,60] };
+    "Makassar":[-5.1477,119.4327,8,10], "Jayapura":[-2.5337,140.7181,9,5], "Makkah":[21.4225,39.8262,3,300], "New Delhi":[28.6139,77.209,5.5,216], "Kuala Lumpur":[3.139,101.6869,8,60] };
   const tabs = []; let active = null;
 
   /** Masukan saat ini; nama ganda (lat/gLat, lon/gLon, tz/tmZn) agar kode lama tetap cocok. */

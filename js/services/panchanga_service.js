@@ -123,6 +123,33 @@ class Panchanga {
     };
   }
 
+  // ───────── Rangkaian harian (untuk grafik 24 jam) ─────────
+  /**
+   * Rangkaian elemen yang berlaku pada [jdMulai, jdSelesai]; nama = "tithi" | "nakshatra" | "yoga" | "karana".
+   * Tiap butir: {awal, akhir (terpotong ke jendela), awalAsli, akhirAsli (waktu sebenarnya), nama, n, paksha?, pada?}
+   */
+  rangkaian(nama, jdMulai, jdSelesai) {
+    const f = this[nama], out = []; let t = jdMulai;
+    for (let g = 0; g < 24; g++) {
+      const s = f.call(this, t);
+      out.push({ ...s, awalAsli: s.awal, akhirAsli: s.akhir, awal: Math.max(s.awal, jdMulai), akhir: Math.min(s.akhir, jdSelesai) });
+      if (s.akhir >= jdSelesai) break; t = s.akhir + 1e-4;
+    }
+    return out;
+  }
+  /**
+   * Caughaḍiyā: siang (terbit→terbenam) dan malam (terbenam→terbit berikutnya) masing-masing dibagi 8.
+   * Siklus siang: Udvega, Cara, Lābha, Amṛta, Kāla, Śubha, Roga (mulai dari indeks 3·vāra); malam: Śubha, Amṛta, Cara, Roga, Kāla, Lābha, Udvega (mulai 2·vāra).
+   * vara 0 = Minggu. kualitas: baik (Amṛta, Śubha, Lābha), netral (Cara), buruk (Udvega, Kāla, Roga).
+   */
+  caughadiya(sr, ss, sr2, vara) {
+    const D = ["Udvega", "Cara", "Lābha", "Amṛta", "Kāla", "Śubha", "Roga"], N = ["Śubha", "Amṛta", "Cara", "Roga", "Kāla", "Lābha", "Udvega"];
+    const q = n => (n === "Amṛta" || n === "Śubha" || n === "Lābha") ? "baik" : n === "Cara" ? "netral" : "buruk", out = [];
+    for (let i = 0; i < 8; i++) { const n = D[(3 * vara + i) % 7]; out.push({ nama: n, kualitas: q(n), malam: false, awal: sr + i * (ss - sr) / 8, akhir: sr + (i + 1) * (ss - sr) / 8 }); }
+    for (let i = 0; i < 8; i++) { const n = N[(2 * vara + i) % 7]; out.push({ nama: n, kualitas: q(n), malam: true, awal: ss + i * (sr2 - ss) / 8, akhir: ss + (i + 1) * (sr2 - ss) / 8 }); }
+    return out;
+  }
+
   // ───────── Pencarian adhika & kṣaya māsa ─────────
   /**
    * Generator bulan lunar (bulan baru → bulan baru) yang bulan barunya jatuh di [jdAwal, jdAkhir].
