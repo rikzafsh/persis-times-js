@@ -18,6 +18,7 @@ buka `index.html` dengan klik ganda (memakai `<script src>` biasa, bukan `import
 | | `js/services/peta_visibilitas_service.js` | Visibilitas hilal per lokasi: Odeh, Yallop, SAAO, Maunder, Bruin |
 | | `js/services/lunar_eclipse_service.js`, `solar_eclipse_service.js` | Gerhana Bulan/Matahari: Besselian, kontak, magnitudo, global, lokal, rentang tahun H |
 | | `js/services/astro_events_service.js` | **Tambahan** (bukan dari Dart): fase Bulan, solstis/ekuinoks, tithi |
+| | `js/services/jadwal_service.js` | **Tambahan**: jadwal lengkap — hisab berdetik + ihtiyat, imsak, twilight, Bulan terbit/terbenam, keterangan kriteria |
 | | `js/services/pelengkap_service.js` | **Tambahan**: waktu istiwa, tafawut (perata waktu), sepertiga malam, rasydulqiblat harian |
 | | `js/services/panchanga_service.js` | **Tambahan**: pañcāṅga lengkap — nakṣatra, yoga, karaṇa, māsa, śakavarṣa, lagna-rāśi, muhūrta (ayanāṃśa Lahiri) |
 | 4. Antarmuka | `js/app/ui.js` | Kerangka: formulir lokasi, sistem tab, pemformat |
@@ -96,6 +97,21 @@ S.solarEclipseGlobalRangeHijri({tahunAwalH:1448, tahunAkhirH:1449, timeScale:Tim
 ```
 `blnH` = bulan Hijriah yang awalnya ditandai ijtimak/oposisi gerhana itu (Matahari: ijtimak; Bulan: purnama).
 Pustaka asli menghitung keadaan geometris lokal meski Matahari/Bulan di bawah ufuk (`altMx < 0`); antarmuka menandainya "tidak teramati".
+
+## Jadwal lengkap: imsak, twilight, Bulan, kriteria (tambahan)
+```js
+const J = new JadwalLengkap();
+const L = { lat:-7.7956, lon:110.3695, elev:100, tz:7, method:PrayerMethod.persatuanIslam, iht:2 };
+const r = J.hitung(12, 11, 2026, L, { imsakMenit: 10 });
+r.hisab.subuh.time;      // jam desimal mentah (berdetik)       r.jadwal.subuh.time  // menit dibulatkan ke bawah + ihtiyat
+r.astro.fajarSipil;      // juga fajarNaut, fajarAstro, senjaSipil/Naut/Astro, bulanTerbit/Transit/Terbenam, lamaSiang/Malam
+J.kriteria(12, 11, 2026, L);                         // [{nama, kriteria, nilai}] keterangan kriteria menurut metode
+J.nilai(12, 11, 2026, L, ['subuh','magrib','bulanTerbit']);   // hanya yang dibutuhkan (hemat; dipakai grafik)
+```
+Kriteria sesuai kode pustaka: Subuh/Isya = sudut Matahari menurut metode; Syuruk/Magrib = −(SD + 34,5′ + 1,76′·√elevasi); Duha = Syuruk + 15 menit;
+Zuhur = istiwa; Asar = bayangan = tinggi benda + bayangan istiwa; Nisfu lail = tengah Magrib–Subuh. Imsak = Subuh − n menit (bawaan 10, dapat diatur).
+Fajar/senja sipil, nautis, astronomis = Matahari −6°, −12°, −18° (memakai `WaktuSalat.subuh/isya` dengan sudut itu). Bulan terbit/terbenam memakai `MoonFunction.moonTransitRiseSet`
+(h = −34′ + 0,7275·π − 0,0353·√elevasi); hasil 0 pada tanggal itu berarti tidak ada kejadian. Isya Ummul Qura (interval) memakai deteksi Ramadan dari kalender Ummul Qura bawaan peramban (`Intl`).
 
 ## Waktu pelengkap salat & rasydulqiblat (tambahan + pustaka)
 ```js

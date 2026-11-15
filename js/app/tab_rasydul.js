@@ -49,23 +49,29 @@
     const ak = new ArahKiblat(), n = +$("rqk").value || 1, rows = [];
     const one = e => { const a = R.sunAltAz(e.jd, L.lat, L.lon); return "<b>" + fmtDT(e.jd, L.tz, true) + "</b><br><small>Makkah " + fmtDT(e.jd, 3, true).split(" ")[1] + " · " + (a.tinggi > 0 ? "☀ di lokasi Anda t " + a.tinggi.toFixed(1) + "°" : "🌙 Matahari di bawah ufuk") + "</small>"; };
     for (let y = y0; y < y0 + n; y++) rows.push("<tr><td><b>" + y + "</b></td><td>" + one(ak.rashdulQiblat(y, L.tz, 1)) + "</td><td>" + one(ak.rashdulQiblat(y, L.tz, 2)) + "</td><td>" + one(ak.antipodaKabah(y, L.tz, 1)) + "</td><td>" + one(ak.antipodaKabah(y, L.tz, 2)) + "</td></tr>");
-    let bulan = "";
-    try {
-      const ev = ak.rashdulQiblatBulan(y0, L.tz);
-      bulan = card("Rasydulqiblat Bulan <small>(" + y0 + ")</small>", "<table><tr><th>#</th><th>Waktu (zona " + L.tz + ")</th><th>Tinggi Bulan di Ka'bah</th><th>Deklinasi Bulan</th></tr>" + ev.map((e, i) => "<tr><td>" + (i + 1) + "</td><td class='num'>" + fmtDT(e.jd, L.tz, true) + "</td><td class='num'>" + e.tinggi.toFixed(2) + "°</td><td class='num'>" + dms(e.deklinasi) + "</td></tr>").join("") + "</table>",
-        "Saat Bulan melintas hampir tepat di atas Ka'bah. Pada malam itu bayangan benda tegak (dengan cahaya Bulan) menuju kiblat bagi pengamat yang Bulannya di atas ufuk.");
-    } catch (e) { bulan = ""; }
+    const bulan = card("Rasydulqiblat Bulan <small>(" + y0 + ")</small>", "<button id='rqb'>Hitung rasydul Bulan (±2 detik)</button><div id='rqbout'></div>",
+      "Saat Bulan melintas hampir tepat di atas Ka'bah. Perhitungan menelusuri posisi Bulan sepanjang tahun sehingga dijalankan hanya bila diminta.");
     $("rqy").innerHTML = card("Rasydulqiblat &amp; antipoda tahunan <small>(" + y0 + (n > 1 ? "–" + (y0 + n - 1) : "") + ")</small>",
       "<table><tr><th>Tahun</th><th>Rasydul 1<br><small>Matahari di zenit Ka'bah</small></th><th>Rasydul 2<br><small>Matahari di zenit Ka'bah</small></th><th>Antipoda 1<br><small>Matahari di nadir Ka'bah</small></th><th>Antipoda 2<br><small>Matahari di nadir Ka'bah</small></th></tr>" + rows.join("") + "</table>",
       "Rasydul 1 sekitar 27/28 Mei dan Rasydul 2 sekitar 15/16 Juli: Matahari tepat di atas Ka'bah (≈12:18 dan 12:27 waktu Makkah), sehingga bayangan benda tegak di seluruh wilayah yang sedang siang menunjuk ke Ka'bah. Antipoda: Matahari tepat di bawah Ka'bah, bayangan menunjuk menjauhi Ka'bah. Perhitungan pustaka asli (deklinasi Matahari = lintang Ka'bah).") + bulan;
   }
 
+  function bulanKlik() {
+    const L = UI.L(), y0 = +$("rqt").value || L.y; $("rqbout").innerHTML = "<p class='note'>Menghitung…</p>";
+    setTimeout(() => {
+      try {
+        const ev = new ArahKiblat().rashdulQiblatBulan(y0, L.tz);
+        $("rqbout").innerHTML = "<table style='margin-top:10px'><tr><th>#</th><th>Waktu (zona " + L.tz + ")</th><th>Tinggi Bulan di Ka'bah</th><th>Deklinasi Bulan</th></tr>" + ev.map((e, i) => "<tr><td>" + (i + 1) + "</td><td class='num'>" + fmtDT(e.jd, L.tz, true) + "</td><td class='num'>" + e.tinggi.toFixed(2) + "°</td><td class='num'>" + dms(e.deklinasi) + "</td></tr>").join("") + "</table><p class='note'>Pada malam itu bayangan benda tegak (dengan cahaya Bulan) menuju kiblat bagi pengamat yang Bulannya di atas ufuk.</p>";
+      } catch (e) { $("rqbout").innerHTML = UI.err(e); }
+    }, 20);
+  }
   let lastY = null;
   function draw() {
     const L = UI.L(), R = new RasydulHarian(), Q = qibla(L);
     if (L.y !== lastY || !$("rqt").value) { $("rqt").value = L.y; lastY = L.y; }
     const y0 = +$("rqt").value || L.y;
     harian(L, Q, R); setahun(L, Q, R, y0); tahunan(L, R, y0);
+    $("rqb").onclick = bulanKlik;
   }
   ["rqm", "rqn", "rqt", "rqk"].forEach(id => { $(id).onchange = draw; });
   UI.onRender("rasydul", draw);

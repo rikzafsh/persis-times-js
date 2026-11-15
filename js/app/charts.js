@@ -28,7 +28,7 @@ const Charts = (() => {
       if (n <= 24 && v > 0) s += txt(x + w / 2, y - 4, o.fmt ? o.fmt(v) : num(v), { s: 10, fill: "var(--fg)" });
       if (i % every === 0) s += txt(x + w / 2, T + ih + (o.rot ? 12 : 16), o.labels[i], { s: 10, rot: o.rot, a: o.rot ? "end" : "middle" });
     });
-    if (o.mean != null) { const y = T + ih - o.mean / mx.max * ih; s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + y + "' y2='" + y + "' stroke='var(--warn)' stroke-dasharray='5 4'/>" + txt(W - R, y - 4, o.meanLabel || "rata-rata", { a: "end", s: 10, fill: "var(--warn)" }); }
+    if (o.mean != null) { const y = T + ih - o.mean / mx.max * ih; s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + y + "' y2='" + y + "' stroke='var(--warn)' stroke-dasharray='5 4'/>" + txt(W - R, T - 4, "┄ " + (o.meanLabel || "rata-rata"), { a: "end", s: 10, fill: "var(--warn)" }); }
     if (o.yTitle) s += txt(12, T + ih / 2, o.yTitle, { rot: -90, s: 10 });
     return svg(h, s, o.title || "grafik batang");
   }
@@ -57,5 +57,39 @@ const Charts = (() => {
     o.points.forEach(p => { s += "<circle cx='" + X(p.x).toFixed(1) + "' cy='" + Y(p.y).toFixed(1) + "' r='1.9' fill='" + col[p.c] + "'><title>" + esc(p.tip || "") + "</title></circle>"; });
     return svg(h, s, o.title || "sebaran waktu");
   }
-  return { bar, timeline, scatter, nice };
+  const palette = ["#1f9d74", "#d98e04", "#3b7dd8", "#c0392b", "#8e5bd1", "#0e9aa7", "#7a8b2c", "#c2548a", "#6b7280"];
+  /**
+   * Grafik garis multi-seri. series[{name,color,pts:[nilai|null]}], labels[] (label sumbu-x per titik),
+   * mode 'abs' (jam desimal → hh:mm) atau 'delta' (menit) atau 'num' (angka biasa); null memutus garis.
+   */
+  function lines(o) {
+    const all0 = []; o.series.forEach(s => s.pts.forEach(v => { if (v != null) all0.push(v); }));
+    const Lw = (o.mode || "abs") === "abs" && all0.length && (Math.max(...all0) >= 24 || Math.min(...all0) < 0) ? 76 : 54;   // ruang label "(+1)"
+    const h = o.h || 320, L = Lw, R = 14, T = 14, B = 34, iw = W - L - R, ih = h - T - B, n = o.labels.length, mode = o.mode || "abs";
+    const all = []; o.series.forEach(s => s.pts.forEach(v => { if (v != null) all.push(v); }));
+    if (!all.length) return "<p class='note'>Tidak ada data untuk ditampilkan.</p>";
+    let lo = Math.min(...all), hi = Math.max(...all), step;
+    if (mode === "abs") { const r = hi - lo || 1; step = [0.25, 0.5, 1, 2, 3, 4, 6].find(s => r / s <= 8) || 6; lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step; if (hi === lo) hi += step; }
+    else { const nn = nice((hi - lo) || 1, 5); step = nn.step; lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step; if (hi === lo) hi += step; }
+    const X = i => L + (n > 1 ? i / (n - 1) : 0.5) * iw, Y = v => T + (1 - (v - lo) / (hi - lo)) * ih;
+    const fmtY = mode === "abs" ? v => { const t = Math.round(v * 60), dd = Math.floor(t / 1440), hh = ((Math.floor(t / 60) % 24) + 24) % 24; return String(hh).padStart(2, "0") + ":" + String(((t % 60) + 60) % 60).padStart(2, "0") + (dd ? " (" + (dd > 0 ? "+" : "−") + Math.abs(dd) + ")" : ""); } : (o.yFmt || (v => num(v).replace("-", "−")));
+    let s = "";
+    for (let v = lo; v <= hi + 1e-9; v += step) s += "<line x1='" + L + "' x2='" + (W - R) + "' y1='" + Y(v).toFixed(1) + "' y2='" + Y(v).toFixed(1) + "' stroke='" + (mode === "delta" && Math.abs(v) < 1e-9 ? "var(--mut)" : "var(--line)") + "'/>" + txt(L - 6, Y(v) + 4, fmtY(v), { a: "end", s: 10 });
+    if (o.yUnit) s += txt(L, 9, o.yUnit, { a: "start", s: 10 });
+    const every = Math.max(1, Math.ceil(n / 9));
+    for (let i = 0; i < n; i += every) s += "<line x1='" + X(i).toFixed(1) + "' x2='" + X(i).toFixed(1) + "' y1='" + T + "' y2='" + (T + ih) + "' stroke='var(--line)' stroke-dasharray='2 3'/>" + txt(X(i), T + ih + 16, o.labels[i], { s: 10 });
+    const tips = n * o.series.length <= 500;
+    o.series.forEach((se, k) => {
+      const col = se.color || palette[k % palette.length]; let seg = [];
+      const flush = () => { if (seg.length > 1) s += "<polyline fill='none' stroke='" + col + "' stroke-width='1.9' stroke-linejoin='round' points='" + seg.join(" ") + "'/>"; seg = []; };
+      se.pts.forEach((v, i) => {
+        if (v == null) { flush(); return; }
+        seg.push(X(i).toFixed(1) + "," + Y(v).toFixed(1));
+        if (n <= 45 || tips) s += "<circle cx='" + X(i).toFixed(1) + "' cy='" + Y(v).toFixed(1) + "' r='" + (n <= 45 ? 2.4 : 1.6) + "' fill='" + col + "'><title>" + esc(se.name + " · " + o.labels[i] + " · " + (o.tip ? o.tip(v) : fmtY(v))) + "</title></circle>";
+      });
+      flush();
+    });
+    return svg(h, s, o.title || "grafik garis");
+  }
+  return { bar, timeline, scatter, lines, palette, nice };
 })();
