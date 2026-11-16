@@ -72,8 +72,9 @@ P.lagna(jd, lat, lon); P.lagnaSpans(jd, lat, lon, 24);    // ascendant sidereal 
 P.muhurta(jdTerbit, jdTerbenam, jdTerbitBerikutnya, vara);// Brahma, Abhijit, Rāhu, Yamagaṇḍa, Gulika + 30 muhūrta
 P.sidSun(jd); P.sidMoon(jd); P.ayanamsa(jd);  // zodiak sidereal
 ```
-Grafik harian 24 jam (tab Tithi & Pañcāṅga, `Charts.dayline`): garis waktu terbit → terbit berikutnya dengan baris Tithi, Nakṣatra, Yoga, Karaṇa, Vāra (+ Caughaḍiyā buruk),
-dan (mode lengkap) Lagna, Caughaḍiyā, Kāla (Rāhu, Yamagaṇḍa, Gulika), serta Brahma/Abhijit muhūrta. Mesin: `Panchanga.rangkaian('tithi'|'nakshatra'|'yoga'|'karana', jdAwal, jdAkhir)` dan
+Grafik harian 24 jam (tab Tithi & Pañcāṅga, `Charts.dayline`): garis waktu terbit → terbit berikutnya, tiap unsur berupa blok berwarna (nuansa bergantian per masa berlaku).
+Tiga mode: (1) Pañcāṅga + lagna-rāśi + 30 muhūrta (15 siang, 15 malam; tanpa penanda waktu baik/buruk), (2) Pañcāṅga saja (Tithi, Nakṣatra, Yoga, Karaṇa, Vāra),
+(3) Lengkap: + Lagna, Caughaḍiyā (hijau baik, abu netral, merah buruk), Kāla (Rāhu, Yamagaṇḍa, Gulika), Brahma/Abhijit muhūrta. Mesin: `Panchanga.rangkaian('tithi'|'nakshatra'|'yoga'|'karana', jdAwal, jdAkhir)` dan
 `Panchanga.caughadiya(sr, ss, sr2, vara)` (siklus siang Udvega-Cara-Lābha-Amṛta-Kāla-Śubha-Roga mulai indeks 3·vāra; malam Śubha-Amṛta-Cara-Roga-Kāla-Lābha-Udvega mulai 2·vāra).
 Validasi terhadap contoh Drik Panchang (New Delhi, Minggu 15 Nov 2026): Tithi Ṣaṣṭhī → Saptamī berakhir 02:02 (contoh 02:00), Nakṣatra Uttarāṣāḍhā → Śravaṇa 23:29 (23:28),
 Karaṇa Kaulava 12:44 (12:43) → Taitila 02:02 → Gara, Yoga Gaṇḍa sepanjang jendela, dan seluruh Caughaḍiyā buruk cocok. Kota "New Delhi" tersedia di daftar kota.

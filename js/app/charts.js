@@ -59,21 +59,22 @@ const Charts = (() => {
   }
 
   /**
-   * Garis waktu harian (gaya Drik Panchang): satu baris per unsur, dari t0 (terbit) sampai t1 (terbit berikutnya).
-   * o: {t0, t1, sunrise, sunset, tz, fmt(jd)→"hh:mm", hour12, rows:[{label, type, items, nama?}]}
-   * type 'seg'    : segmen berurutan [{a,b,nama,tip}]; nama di atas garis, jam pergantian di bawah penanda, garis putus-putus ke sumbu
-   * type 'vara'   : braket [{a,b,nama,warna,tip}] di bawah garis + nama hari di bawahnya (mis. Caughaḍiyā buruk)
-   * type 'bar'    : balok berwarna [{a,b,nama,warna,tip}] (mis. seluruh Caughaḍiyā)
-   * type 'bracket': braket berlabel [{a,b,nama,warna,tip}]; label yang berdekatan disusun berundak agar tidak bertumpuk
+   * Garis waktu harian berblok (gaya Drik Panchang, tiap unsur satu warna): t0 (terbit) → t1 (terbit berikutnya).
+   * o: {t0, t1, sunrise, sunset, tz, fmt(jd)→"hh:mm", hour12, rows:[{label, type, warna?, items, nama?}]}
+   * type 'seg'    : blok berurutan [{a,b,nama,short?,tip}]; warna = [nuansa1, nuansa2] bergantian; jam pergantian di bawah blok
+   * type 'vara'   : satu blok sepanjang jendela (nama hari)
+   * type 'bar'    : blok berwarna per butir [{a,b,nama,warna,tip}] (mis. Caughaḍiyā)
+   * type 'vbar'   : blok tinggi dengan nama diputar tegak [{a,b,nama,warna,tip}] (mis. 30 muhūrta)
+   * type 'bracket': braket berlabel [{a,b,nama,warna,tip}]; label berdekatan disusun berundak
    */
   function dayline(o) {
-    const Wd = 900, L = 106, R = 26, iw = Wd - L - R, axisY = 44, rows = o.rows, HT = { seg: 58, vara: 88, bar: 46, bracket: 52 };
-    const X = jd => L + (jd - o.t0) / (o.t1 - o.t0) * iw, tw = (t, fs) => String(t).length * 0.58 * fs;
-    const fit = (t, w, fs) => { if (tw(t, fs) <= w - 6) return t; const k = Math.floor((w - 6) / (0.58 * fs)) - 1; return k >= 4 ? String(t).slice(0, k) + "…" : ""; };
-    let yy = 104; const ys = rows.map(r => { const y = yy; yy += HT[r.type] || 56; return y; });
-    const H = yy + 14;
+    const Wd = 900, L = 106, R = 26, iw = Wd - L - R, axisY = 44, rows = o.rows, UP = { seg: 15, vara: 15, bar: 13, bracket: 16, vbar: 44 }, DN = { seg: 36, vara: 16, bar: 14, bracket: 20, vbar: 45 };
+    const X = jd => L + (jd - o.t0) / (o.t1 - o.t0) * iw, tw = (t, fs) => String(t).length * 0.6 * fs;
+    const fit = (t, w, fs) => { if (tw(t, fs) <= w - 4) return t; const k = Math.floor((w - 4) / (0.6 * fs)) - 1; return k >= 4 ? String(t).slice(0, k) + "…" : ""; };
+    let yy = 100, prev = null; const ys = rows.map(r => { const u = UP[r.type] || 15; yy += (prev == null ? u : (DN[prev] + 10 + u)); prev = r.type; return yy; });
+    const H = yy + (DN[prev] || 16) + 14, sep = "stroke='var(--card)' stroke-width='1.6'";
     let s = "";
-    s += "<rect x='" + X(o.sunrise).toFixed(1) + "' y='" + (axisY - 20) + "' width='" + (X(o.sunset) - X(o.sunrise)).toFixed(1) + "' height='" + (H - axisY + 8) + "' fill='var(--ac2)'/>";
+    s += "<rect x='" + X(o.sunrise).toFixed(1) + "' y='" + (axisY - 20) + "' width='" + (X(o.sunset) - X(o.sunrise)).toFixed(1) + "' height='" + (H - axisY + 6) + "' fill='var(--ac2)'/>";
     s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + axisY + "' y2='" + axisY + "' stroke='var(--mut)' stroke-width='1.4'/>";
     const lh0 = ((((o.t0 + 0.5 + o.tz / 24) % 1) + 1) % 1) * 24;
     for (let h = Math.ceil(lh0 - 1e-9); ; h++) {
@@ -83,36 +84,33 @@ const Charts = (() => {
     }
     const sun = (jd, lab) => { const x = X(jd); return "<path d='M" + (x - 9).toFixed(1) + " " + axisY + " A9 9 0 0 1 " + (x + 9).toFixed(1) + " " + axisY + " Z' fill='#f5a623' stroke='#b8740a' stroke-width='1.2'/>" + txt(x, axisY - 14, lab, { s: 11, fill: "var(--fg)" }); };
     s += sun(o.t0, o.fmt(o.t0)) + sun(o.sunset, o.fmt(o.sunset)) + sun(o.t1, o.fmt(o.t1));
-    const stagger = (items, y, fs) => {                                   // label braket berundak
-      const lv = []; return items.map(it => {
-        const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = tw(it.nama, fs), cx = (xa + xb) / 2, x0 = cx - w / 2, x1 = cx + w / 2; let k = 0;
-        while (lv[k] != null && x0 < lv[k] + 4) k++;
-        lv[k] = x1; return { it, xa, xb, cx, y: y - k * 12 };
-      });
-    };
+    // garis putus-putus penghubung sumbu → blok (digambar di bawah blok agar tak mengiris blok baris lain)
+    rows.forEach((r, i) => { if (r.type === "seg") r.items.forEach(it => { if (it.b < o.t1 - 1e-6) { const x = X(it.b).toFixed(1); s += "<line x1='" + x + "' x2='" + x + "' y1='" + (axisY + 24) + "' y2='" + (ys[i] - 15) + "' stroke='var(--mut)' stroke-width='.9' stroke-dasharray='3 3' opacity='.55'/>"; } }); });
+    const stagger = (items, y, fs) => { const lv = []; return items.map(it => { const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = tw(it.nama, fs), cx = (xa + xb) / 2, x0 = cx - w / 2, x1 = cx + w / 2; let k = 0; while (lv[k] != null && x0 < lv[k] + 4) k++; lv[k] = x1; return { it, xa, xb, cx, y: y - k * 12 }; }); };
     const bracket = (it, xa, xb, by, cx, ly, fs) => "<path d='M" + xa.toFixed(1) + " " + (by - 5) + " V" + (by + 5) + " M" + xa.toFixed(1) + " " + by + " H" + xb.toFixed(1) + " M" + xb.toFixed(1) + " " + (by - 5) + " V" + (by + 5) + "' stroke='" + it.warna + "' stroke-width='1.6' fill='none'><title>" + esc(it.tip || it.nama) + "</title></path>" + txt(cx, ly, it.nama, { s: fs, fill: it.warna });
     rows.forEach((r, i) => {
-      const y0 = ys[i];
-      s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + y0 + "' y2='" + y0 + "' stroke='var(--line)'/>" + txt(L - 8, y0 + 4, r.label, { a: "end", s: 11.5, fill: "var(--fg)" });
+      const y0 = ys[i], warna = r.warna || ["#3b6fd1", "#5b8def"];
+      s += txt(L - 8, y0 + 4, r.label, { a: "end", s: 11.5, fill: "var(--fg)" });
       if (r.type === "seg") {
-        r.items.forEach(it => {
-          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa;
-          s += "<rect x='" + xa.toFixed(1) + "' y='" + (y0 - 22) + "' width='" + w.toFixed(1) + "' height='42' fill='transparent'><title>" + esc(it.tip || it.nama) + "</title></rect>" + txt((xa + xb) / 2, y0 - 9, (() => { let l = fit(it.nama, w, 11.5); if (it.short && l.endsWith("…")) { const f2 = fit(it.short, w, 11.5); if (f2) l = f2; } return l; })(), { s: 11.5, fill: "var(--fg)" });
-          if (it.b < o.t1 - 1e-6) {
-            const x = X(it.b);
-            s += "<line x1='" + x.toFixed(1) + "' x2='" + x.toFixed(1) + "' y1='" + (axisY + 24) + "' y2='" + y0 + "' stroke='var(--mut)' stroke-width='.9' stroke-dasharray='3 3' opacity='.6'/>" +
-              "<path d='M" + (x - 8).toFixed(1) + " " + (y0 - 3.5) + " L" + (x - 2).toFixed(1) + " " + y0 + " L" + (x - 8).toFixed(1) + " " + (y0 + 3.5) + "Z M" + (x + 8).toFixed(1) + " " + (y0 - 3.5) + " L" + (x + 2).toFixed(1) + " " + y0 + " L" + (x + 8).toFixed(1) + " " + (y0 + 3.5) + "Z' fill='#9a6b3a'/>" + txt(x, y0 + 18, o.fmt(it.b), { s: 11, fill: "var(--fg)" });
-          }
-        });
-      } else if (r.type === "bar") {
-        r.items.forEach(it => {
-          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa;
-          s += "<rect x='" + xa.toFixed(1) + "' y='" + (y0 - 13) + "' width='" + Math.max(0, w - 1).toFixed(1) + "' height='26' rx='3' fill='" + it.warna + "' opacity='.9'><title>" + esc(it.tip || it.nama) + "</title></rect>" + txt((xa + xb) / 2, y0 + 4, fit(it.nama, w, 10), { s: 10, fill: "#fff" });
+        r.items.forEach((it, k) => {
+          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa; let lab = fit(it.nama, w, 11.5);
+          if (it.short && lab.endsWith("…")) { const f2 = fit(it.short, w, 11.5); if (f2) lab = f2; }
+          s += "<rect x='" + xa.toFixed(1) + "' y='" + (y0 - 15) + "' width='" + w.toFixed(1) + "' height='30' rx='3' fill='" + warna[k % warna.length] + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>" +
+            txt((xa + xb) / 2, y0 + 4.5, lab, { s: 11.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' ");
+          if (it.b < o.t1 - 1e-6) s += txt(X(it.b), y0 + 29, o.fmt(it.b), { s: 11, fill: "var(--fg)" });
         });
       } else if (r.type === "vara") {
-        stagger(r.items, y0 + 5, 10.5).forEach(g => { s += bracket(g.it, g.xa, g.xb, y0 + 14, g.cx, g.y, 10.5); });
-        s += txt(L + iw / 2, y0 + 40, r.nama, { s: 12.5, fill: "var(--fg)" }) + "<path d='M" + (Wd - R) + " " + y0 + " l-8 -3.5 v7z' fill='var(--mut)'/>";
+        s += "<rect x='" + L + "' y='" + (y0 - 15) + "' width='" + iw + "' height='30' rx='3' fill='" + warna[0] + "'><title>" + esc(r.nama) + "</title></rect>" + txt(L + iw / 2, y0 + 5, r.nama, { s: 12.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' ");
+      } else if (r.type === "bar" || r.type === "vbar") {
+        const hh = r.type === "bar" ? 26 : 88, y1 = y0 - hh / 2;
+        r.items.forEach(it => {
+          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa, cx = (xa + xb) / 2;
+          s += "<rect x='" + xa.toFixed(1) + "' y='" + y1 + "' width='" + Math.max(0, w).toFixed(1) + "' height='" + hh + "' rx='3' fill='" + it.warna + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>";
+          if (r.type === "bar") s += txt(cx, y0 + 4, fit(it.nama, w, 10), { s: 10, fill: "#fff" });
+          else if (w >= 11) s += txt(cx, y0 + 3.5, it.nama.length > 14 ? it.nama.slice(0, 13) + "…" : it.nama, { s: 9.5, fill: "#fff", rot: -90 });
+        });
       } else {
+        s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + y0 + "' y2='" + y0 + "' stroke='var(--line)'/>";
         stagger(r.items, y0 + 3, 10.5).forEach(g => { s += bracket(g.it, g.xa, g.xb, y0 + 12, g.cx, g.y, 10.5); });
       }
     });

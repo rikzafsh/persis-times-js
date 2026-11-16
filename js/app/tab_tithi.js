@@ -6,7 +6,7 @@
 (function () {
   const { $, card, fmtDT, fmtD } = UI;
   const p = UI.add({ id: "tithi", label: "Tithi & Pañcāṅga", icon: "🪔" });
-  p.innerHTML = "<div class='card'><h2>Grafik harian 24 jam <small>(terbit → terbit berikutnya)</small></h2><div class='grid'><label>Rincian<select id='pgm'><option value='lengkap' selected>Lengkap (+ lagna, caughaḍiyā, kāla, muhūrta baik)</option><option value='panca'>Pañcāṅga saja</option></select></label><label>Sumbu jam<select id='pgf'><option value='24' selected>24 jam</option><option value='12'>12 jam</option></select></label></div><div id='pgout' style='margin-top:12px'></div></div><div id='pdet'></div><div class='card'><h2>Kalender Pañcāṅga</h2><div class='grid'><label>Jumlah hari<select id='tn'><option value='7' selected>7 hari</option><option value='15'>15 hari</option><option value='30'>30 hari (±4 dtk)</option></select></label></div></div><div id='tout'></div>";
+  p.innerHTML = "<div class='card'><h2>Grafik harian 24 jam <small>(terbit → terbit berikutnya)</small></h2><div class='grid'><label>Rincian<select id='pgm'><option value='muhurta' selected>Pañcāṅga + lagna-rāśi + 30 muhūrta (tanpa waktu baik)</option><option value='panca'>Pañcāṅga saja</option><option value='lengkap'>Lengkap (+ lagna, caughaḍiyā, kāla, muhūrta baik)</option></select></label><label>Sumbu jam<select id='pgf'><option value='24' selected>24 jam</option><option value='12'>12 jam</option></select></label></div><div id='pgout' style='margin-top:12px'></div></div><div id='pdet'></div><div class='card'><h2>Kalender Pañcāṅga</h2><div class='grid'><label>Jumlah hari<select id='tn'><option value='7' selected>7 hari</option><option value='15'>15 hari</option><option value='30'>30 hari (±4 dtk)</option></select></label></div></div><div id='tout'></div>";
 
   const hmOf = (jd, tz) => fmtDT(jd, tz).split(" ")[1];
   const dayOf = (jd, tz) => fmtDT(jd, tz).split(" ")[0];
@@ -19,33 +19,46 @@
     return [J.kmjd(d, mo, y, a.isNormal ? a.time : 6, L.tz), J.kmjd(d, mo, y, b.isNormal ? b.time : 18, L.tz)];
   }
 
-  // ── grafik harian 24 jam ──
+  // ── grafik harian 24 jam (blok berwarna per unsur) ──
+  const WARNA = { tithi: ["#3b6fd1", "#5b8def"], naks: ["#7b4fc9", "#9a73e0"], yoga: ["#0e8f8f", "#25b3b0"], karana: ["#c4691a", "#dd8730"], vara: ["#a0522d"], lagna: ["#b83b7a", "#d65f9b"], mSiang: ["#a87c0a", "#c29a1a"], mMalam: ["#454a96", "#646ab8"] };
   function grafikHarian(L, P, sr, ss, sr2, w0, mh) {
-    const tz = L.tz, h12 = $("pgf").value === "12", lengkap = $("pgm").value !== "panca";
+    const tz = L.tz, h12 = $("pgf").value === "12", mode = $("pgm").value || "muhurta", denganLagna = mode !== "panca";
     const hm = jd => { const t = fmtDT(jd, tz).split(" ")[1]; if (!h12) return t; const [h, m] = t.split(":").map(Number); return String((h % 12) || 12).padStart(2, "0") + ":" + String(m).padStart(2, "0"); };
     const rentang = s => fmtDT(s.awalAsli, tz, true) + " → " + fmtDT(s.akhirAsli, tz, true);
     const el = (kunci, nama) => P.rangkaian(kunci, sr, sr2).map(s => ({ ...s, a: s.awal, b: s.akhir, nama: nama(s), tip: nama(s) + "\n" + rentang(s) }));
     const tithi = el("tithi", s => s.nama + ", " + s.paksha).map(s => ({ ...s, short: s.nama })), naks = el("nakshatra", s => s.nama), yoga = el("yoga", s => s.nama), karana = el("karana", s => s.nama);
     naks.forEach(s => { s.tip += "\npada " + s.pada; });
-    const caug = P.caughadiya(sr, ss, sr2, w0), WARNA = { baik: "#2e9e5b", netral: "#7b8794", buruk: "#c0392b" };
-    const ctip = c => c.nama + " (" + (c.malam ? "malam" : "siang") + ", " + c.kualitas + ")\n" + hm(c.awal) + " – " + hm(c.akhir);
-    const rows = [{ label: "Tithi", type: "seg", items: tithi }, { label: "Nakṣatra", type: "seg", items: naks }, { label: "Yoga", type: "seg", items: yoga }, { label: "Karaṇa", type: "seg", items: karana },
-      { label: "Vāra", type: "vara", nama: PN.VARA[w0], items: caug.filter(c => c.kualitas === "buruk").map(c => ({ a: c.awal, b: c.akhir, nama: c.nama, warna: "var(--bad)", tip: ctip(c) })) }];
-    let lagna = [];
-    if (lengkap) {
+    const rows = [{ label: "Tithi", type: "seg", warna: WARNA.tithi, items: tithi }, { label: "Nakṣatra", type: "seg", warna: WARNA.naks, items: naks }, { label: "Yoga", type: "seg", warna: WARNA.yoga, items: yoga },
+      { label: "Karaṇa", type: "seg", warna: WARNA.karana, items: karana }, { label: "Vāra", type: "vara", warna: WARNA.vara, nama: PN.VARA[w0] }];
+    let lagna = [], m30 = [];
+    if (denganLagna) {
       lagna = P.lagnaSpans(sr, L.lat, L.lon, (sr2 - sr) * 24).map(x => ({ ...x, awalAsli: x.awal, akhirAsli: x.akhir, a: Math.max(x.awal, sr), b: Math.min(x.akhir, sr2) })).filter(x => x.b > x.a).map(x => ({ ...x, tip: x.nama + "\n" + rentang(x) }));
+      rows.push({ label: "Lagna-rāśi", type: "seg", warna: WARNA.lagna, items: lagna });
+    }
+    if (mode === "muhurta") {                                       // 30 muhūrta: 15 siang + 15 malam, tanpa penanda waktu baik/buruk
+      m30 = [...mh.siang.map((x, i) => ({ ...x, malam: false, no: i + 1 })), ...mh.malam.map((x, i) => ({ ...x, malam: true, no: i + 1 }))];
+      rows.push({ label: "Muhūrta", type: "vbar", items: m30.map((x, i) => ({ a: x.awal, b: x.akhir, nama: x.nama, warna: (x.malam ? WARNA.mMalam : WARNA.mSiang)[x.no % 2], tip: x.no + ". " + x.nama + " (" + (x.malam ? "malam" : "siang") + ")\n" + fmtDT(x.awal, tz, true) + " → " + fmtDT(x.akhir, tz, true) })) });
+    }
+    if (mode === "lengkap") {
+      const caug = P.caughadiya(sr, ss, sr2, w0), Q = { baik: "#2e9e5b", netral: "#7b8794", buruk: "#c0392b" };
+      const ctip = c => c.nama + " (" + (c.malam ? "malam" : "siang") + ", " + c.kualitas + ")\n" + hm(c.awal) + " – " + hm(c.akhir);
       const kl = (n, a) => ({ a: a.awal, b: a.akhir, nama: n, warna: "var(--bad)", tip: n + "\n" + hm(a.awal) + " – " + hm(a.akhir) }), bk = (n, a, b) => ({ a, b, nama: n, warna: "var(--ac)", tip: n + "\n" + hm(a) + " – " + hm(b) });
-      rows.push({ label: "Lagna", type: "seg", items: lagna });
-      rows.push({ label: "Caughaḍiyā", type: "bar", items: caug.map(c => ({ a: c.awal, b: c.akhir, nama: c.nama, warna: WARNA[c.kualitas], tip: ctip(c) })) });
+      rows.push({ label: "Caughaḍiyā", type: "bar", items: caug.map(c => ({ a: c.awal, b: c.akhir, nama: c.nama, warna: Q[c.kualitas], tip: ctip(c) })) });
       rows.push({ label: "Kāla", type: "bracket", items: [kl("Rāhu kāla", mh.rahu), kl("Yamagaṇḍa", mh.yamaganda), kl("Gulika", mh.gulika)] });
       rows.push({ label: "Muhūrta baik", type: "bracket", items: [bk("Abhijit", mh.abhijit.awal, mh.abhijit.akhir), bk("Brahma", sr2 - 96 / 1440, sr2 - 48 / 1440)] });
     }
     const svg = Charts.dayline({ t0: sr, t1: sr2, sunrise: sr, sunset: ss, tz, fmt: hm, hour12: h12, rows, title: "Garis waktu pañcāṅga " + fmtD(sr, tz) });
     const tb = (a, arr) => arr.map(s => "<tr><td>" + a + "</td><td><b>" + s.nama + "</b></td><td class='num'>" + fmtDT(s.awalAsli, tz, true) + "</td><td class='num'>" + fmtDT(s.akhirAsli, tz, true) + "</td></tr>").join("");
-    $("pgout").innerHTML = "<div class='wrap'><div style='min-width:860px'>" + svg + "</div></div>" +
-      "<p class='note'>Latar hijau = siang (terbit " + hm(sr) + ", terbenam " + hm(ss) + "); jam di garis putus-putus = saat unsur berganti (zona " + tz + "). Hari Hindu berjalan dari terbit ke terbit berikutnya" + (lengkap ? ". Caughaḍiyā: hijau = baik (Amṛta, Śubha, Lābha), abu = netral (Cara), merah = buruk (Udvega, Kāla, Roga); Brahma muhūrta di sini = menjelang terbit berikutnya." : ".") + " Arahkan kursor/ketuk segmen untuk waktu lengkapnya.</p>" +
-      "<details style='margin-top:8px'><summary><b>Rincian waktu mulai &amp; berakhir</b></summary><div class='wrap'><table><tr><th>Aṅga</th><th>Nama</th><th>Mulai</th><th>Berakhir</th></tr>" + tb("Tithi", tithi) + tb("Nakṣatra", naks) + tb("Yoga", yoga) + tb("Karaṇa", karana) + (lengkap ? tb("Lagna", lagna) : "") + "</table></div></details>";
+    const chip = (w, n) => "<span style='margin-right:12px;white-space:nowrap'><span style='color:" + w[0] + "'>■</span><span style='color:" + w[w.length - 1] + "'>■</span> " + n + "</span>";
+    const legenda = chip(WARNA.tithi, "Tithi") + chip(WARNA.naks, "Nakṣatra") + chip(WARNA.yoga, "Yoga") + chip(WARNA.karana, "Karaṇa") + chip(WARNA.vara, "Vāra") + (denganLagna ? chip(WARNA.lagna, "Lagna-rāśi") : "") + (mode === "muhurta" ? chip(WARNA.mSiang, "Muhūrta siang") + chip(WARNA.mMalam, "Muhūrta malam") : "");
+    $("pgout").innerHTML = "<div class='wrap'><div style='min-width:860px'>" + svg + "</div></div><div style='margin:6px 0;font-size:13px'>" + legenda + "</div>" +
+      "<p class='note'>Latar hijau = siang (terbit " + hm(sr) + ", terbenam " + hm(ss) + "). Tiap blok = satu masa berlaku unsurnya; angka di bawah blok = saat unsur berganti (zona " + tz + "), nuansa warna bergantian agar blok bersebelahan terbedakan. Hari Hindu berjalan dari terbit ke terbit berikutnya." +
+      (mode === "muhurta" ? " Muhūrta: siang (terbit→terbenam) dan malam (terbenam→terbit) masing-masing dibagi 15 sama panjang; nama tertulis tegak, arahkan kursor/ketuk untuk jamnya." : "") +
+      (mode === "lengkap" ? " Caughaḍiyā: hijau = baik, abu = netral, merah = buruk; Brahma muhūrta = menjelang terbit berikutnya." : "") + " Arahkan kursor/ketuk blok untuk waktu lengkapnya.</p>" +
+      "<details style='margin-top:8px'><summary><b>Rincian waktu mulai &amp; berakhir</b></summary><div class='wrap'><table><tr><th>Aṅga</th><th>Nama</th><th>Mulai</th><th>Berakhir</th></tr>" + tb("Tithi", tithi) + tb("Nakṣatra", naks) + tb("Yoga", yoga) + tb("Karaṇa", karana) + (denganLagna ? tb("Lagna", lagna) : "") +
+      m30.map(x => "<tr><td>Muhūrta " + (x.malam ? "malam" : "siang") + "</td><td><b>" + x.no + ". " + x.nama + "</b></td><td class='num'>" + fmtDT(x.awal, tz, true) + "</td><td class='num'>" + fmtDT(x.akhir, tz, true) + "</td></tr>").join("") + "</table></div></details>";
   }
+
   function draw() {
     const L = UI.L(), A = new AstroEvents(), P = new Panchanga(A), tz = L.tz, N = +$("tn").value || 7;
     const day = i => { const t = new Date(Date.UTC(L.y, L.mo - 1, L.d + i)); return [t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate(), t.getUTCDay()]; };
