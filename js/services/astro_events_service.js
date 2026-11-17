@@ -63,7 +63,7 @@ class AstroEvents {
 
   // ───────── Tithi (hari lunar) ─────────
   /** Tithi 1–30 pada saat jd. 1–15 = Shukla (menuju purnama), 16–30 = Krishna (menuju bulan baru). */
-  tithiNama(n) { const i = (n - 1) % 15; return i === 14 ? (n === 15 ? "Purnima" : "Amavasya") : TITHI_NAMA[i]; }
+  tithiNama(n) { return typeof PN !== "undefined" ? PN.TITHI[(n - 1) % 15] : TITHI_NAMA[(n - 1) % 15]; }
   tithiAt(jd) {
     const e = this.elongation(jd), n = Math.floor(e / 12) + 1;
     return { n, nama: this.tithiNama(n), paksha: n <= 15 ? "Shukla" : "Krishna", elongasi: e, bagian: (e % 12) / 12 };

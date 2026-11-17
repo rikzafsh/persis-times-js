@@ -94,6 +94,22 @@ Validasi: adhika 2001 Āśvina, 2004 Śrāvaṇa, 2007 Jyeṣṭha, 2010 Vaiśā
 kṣaya 1963 (Mārgaśīrṣa), 1983 (Māgha), 2123–24 (Pauṣa). Tab antarmuka: linimasa, frekuensi per māsa, selang antar adhika, kurun, siklus Metonik (`charts.js`, SVG tanpa pustaka luar).
 Tradisi regional bisa berbeda dalam detail (mis. aturan hari perayaan, vāra muhūrta); anggap ini hitungan astronomis, bukan panchang resmi.
 
+## Ejaan nama & Pawukon
+Nama māsa, tiŧi, nakṣatꭉa (beserta déwatā dan maṇḍala), yoga, karaṇa, muhūr̀tta, rāšī, wuku, sadwāra, pañcawāra, saptawāra, dan pakṣa mengikuti daftar ejaan yang diberikan pengguna
+(`PN` di `panchanga_service.js`; urutan = urutan baku, jumlah divalidasi: 15, 27, 27, 27, 27, 12, 12, 7, 6, 5, 30, 15, 2).
+Catatan: tiŧi 15 dan 30 sama-sama "Pañcadašī" (dibedakan pakṣa Šukla/Kr̥ṣṇa); nama karaṇa tetap dipetakan menurut identitas (Sakuni = 58, Catuspada = 59, Naga = 60);
+muhūr̀tta memakai sistem 15×2 (15 siang + 15 malam) dengan daftar nama yang sama untuk keduanya. Ejaan memakai aksara Latin Extended-D/E; bila tampil kotak, pasang font seperti
+Junicode, Gentium Plus, Charis SIL, atau FreeSerif (CSS sudah mencantumkannya sebagai cadangan).
+```js
+const P = new Panchanga();
+P.pawukon(2026, 11, 15);   // {hariKe, noWuku, wuku, saptawara, pancawara, sadwara, idx:{...}}
+P.nakshatra(jd);           // {n, nama, pada, idx}  →  PN.DEWATA[idx], PN.MANDALA[idx]
+```
+Pawukon (siklus 210 hari): hari ke-0 = Minggu 17-12-2023 (awal wuku Sinta); saptawāra = d mod 7, pañcawāra = (d+1) mod 5 (Ümanis = 0), sadwāra = d mod 6 (Tuŋlꜽ = 0), wuku = ⌊d/7⌋.
+Validasi: Galungan (Buđa Kaliww̭ͧan⸝, wuku Duṅulan⸝) 28-2-2024, 23-4-2025, 19-11-2025, 17-6-2026; Saniscara Kaliww̭ͧan⸝ (Tumpek) jatuh tepat pada enam wuku Tumpek
+(Landĕp, Wariga, Kuniṅan, Kuruwĕlut, Wuyꜽ, Wayaŋ). Offset sadwāra (Tuŋlꜽ pada Raditỿa wuku Sinta) tidak dapat diverifikasi dari sumber independen; ia konsisten dengan contoh pengguna
+(Raditỿa, Kaliww̭ͧan⸝, Tuŋlꜽ, wuku Bala). Hari pawukon di grafik memakai tanggal sipil hari terbit (Bali menggantinya pukul 00:00).
+
 ## Gerhana
 ```js
 const S = new SolarEclipseService(), L = new LunarEclipseService();

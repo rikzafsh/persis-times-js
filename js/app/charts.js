@@ -100,7 +100,7 @@ const Charts = (() => {
           if (it.b < o.t1 - 1e-6) s += txt(X(it.b), y0 + 29, o.fmt(it.b), { s: 11, fill: "var(--fg)" });
         });
       } else if (r.type === "vara") {
-        s += "<rect x='" + L + "' y='" + (y0 - 15) + "' width='" + iw + "' height='30' rx='3' fill='" + warna[0] + "'><title>" + esc(r.nama) + "</title></rect>" + txt(L + iw / 2, y0 + 5, r.nama, { s: 12.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' ");
+        s += "<rect x='" + L + "' y='" + (y0 - 15) + "' width='" + iw + "' height='30' rx='3' fill='" + warna[0] + "'><title>" + esc(r.tip || r.nama) + "</title></rect>" + txt(L + iw / 2, y0 + 5, r.nama, { s: 12.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' ");
       } else if (r.type === "bar" || r.type === "vbar") {
         const hh = r.type === "bar" ? 26 : 88, y1 = y0 - hh / 2;
         r.items.forEach(it => {

@@ -6,18 +6,28 @@
  * agar sebanding dengan ayanāṃśa rata-rata. Semua waktu berupa JD UT.
  */
 const PN = {
-  TITHI: ["Pratipadā","Dvitīyā","Tṛtīyā","Caturthī","Pañcamī","Ṣaṣṭhī","Saptamī","Aṣṭamī","Navamī","Daśamī","Ekādaśī","Dvādaśī","Trayodaśī","Caturdaśī"],
-  NAKSATRA: ["Aśvinī","Bharaṇī","Kṛttikā","Rohiṇī","Mṛgaśirā","Ārdrā","Punarvasu","Puṣya","Āśleṣā","Maghā","Pūrva Phālgunī","Uttara Phālgunī","Hasta","Citrā","Svātī","Viśākhā","Anurādhā","Jyeṣṭhā","Mūla","Pūrvāṣāḍhā","Uttarāṣāḍhā","Śravaṇa","Dhaniṣṭhā","Śatabhiṣā","Pūrva Bhādrapadā","Uttara Bhādrapadā","Revatī"],
-  YOGA: ["Viṣkambha","Prīti","Āyuṣmān","Saubhāgya","Śobhana","Atigaṇḍa","Sukarman","Dhṛti","Śūla","Gaṇḍa","Vṛddhi","Dhruva","Vyāghāta","Harṣaṇa","Vajra","Siddhi","Vyatīpāta","Varīyān","Parigha","Śiva","Siddha","Sādhya","Śubha","Śukla","Brahman","Aindra","Vaidhṛti"],
-  KARANA_BERGERAK: ["Bava","Bālava","Kaulava","Taitila","Gara","Vaṇija","Viṣṭi (Bhadrā)"],
-  MASA: ["Caitra","Vaiśākha","Jyeṣṭha","Āṣāḍha","Śrāvaṇa","Bhādrapada","Āśvina","Kārttika","Mārgaśīrṣa","Pauṣa","Māgha","Phālguna"],
-  RASI: ["Meṣa","Vṛṣabha","Mithuna","Karka","Siṃha","Kanyā","Tulā","Vṛścika","Dhanus","Makara","Kumbha","Mīna"],
-  VARA: ["Ravivāra","Somavāra","Maṅgalavāra","Budhavāra","Guruvāra","Śukravāra","Śanivāra"],
-  MUHURTA_SIANG: ["Rudra","Āhi","Mitra","Pitṛ","Vasu","Vāra","Viśvadeva","Abhijit","Śatamukha","Puruhūta","Vāhinī","Naktanakara","Varuṇa","Aryaman","Bhaga"],
-  MUHURTA_MALAM: ["Girīśa","Ajapāda","Ahirbudhnya","Pūṣā","Aśvinī","Yama","Agni","Vidhātṛ","Caṇḍa","Aditi","Jīva (Amṛta)","Viṣṇu","Dyumadgadyuti","Brahmā","Samudra"],
+  // Ejaan mengikuti daftar yang diberikan pengguna (aksara Latin-Jawa Kuna); urutan = urutan baku.
+  TITHI: ["Pꭉaŧama","Dwitīyā","Tꭉétỿa","Catur̀ŧī","Pañcamī","Ṣaṣṭī","Saptamī","Äṣṭamī","Nawamī","Dašamī","Ë́kādašī","Dwādašī","Tꭉayodašī","Catur̀dašī","Pañcadašī"],
+  NAKSATRA: ["äšwini","ƀaraṇī","kr̥t͟tikā","rohiṇī","mr̥gašīr̀ṣa","ǟr̀dꭉā","punar̀wasu","puṣỿa","ǟšléṣā","maǥā","pūr̀w͟wa⹝ꝑalguṇī","üttara⹝ꝑalguṇī","hasta","citꭉā","swāti","wišāꝁā","änurāđā","jỿéṣŧ̣ā","mūla","pūr̀w͟wa⹝ǟṣāđ̣ā","üttara⹝ǟṣāđ̣ā","šꭉāwaṇa","đaniṣŧ̣ā","šataƀiṣā","pūr̀w͟wa⹝ƀādꭉapada","üttara⹝ƀādꭉapada","réwatī"],
+  DEWATA: ["Äšwini","Yama","Ägnī","Bꭉahmā","Candꭉa","Šiwa","Ǟditỿa","Br̥haspati","Nāga","Pitara","Ƀagā","Ǟr̀y⃭ỿamana","Ǟditỿa","Wiswakaṙmma","Wayu","Ïndrâgni","Mitꭉa","Ïndꭉa","Nꜽr̥̈̄ti","Jala","Wišwadéwā","Wiṣṇu","Äṣṭawasu","Warūṇa","Äjꜽkapāda","Ähir̀buđnỿa","Pūṣā"],
+  MANDALA: ["Bāyabỿa","Ǟgnéya","Ǟgnéya","Mahe̋ndꭉa","Bāyabỿa","Bāruṇỿa","Bāyabỿa","Ǟgnéya","Bāruṇỿa","Ǟgnéya","Ǟgnéya","Bāyabỿa","Bāyabỿa","Bāyabỿa","Bāyabỿa","Ǟgnéya","Mahe̋ndꭉa","Mahe̋ndꭉa","Bāruṇỿa","Bāruṇỿa","Mahe̋ndꭉa","Mahe̋ndꭉa","Mahe̋ndꭉa","Bāruṇỿa","Mahe̋ndꭉa","Bāruṇỿa","Bāruṇỿa"],
+  YOGA: ["Wiṣkamƀa","Pꭉīti","Ǟyuṣmāna","Sꜷƀāgỿa","Šoƀana","Ätigaṇḍa","Sukar̀m͟mā","Đr̥ti","Šūla","Gaṇḍa","Wr̥dđi","Đꭉuwa","Wỿāǥāta","Har̀ṣaṇa","Wajꭉa","Sidđi","Wỿatipāta","Warīyas⸝","Pariǥa","Šiwa","Sidđa","Sāđỿa","Šuƀa","Šukla","Bꭉahma","Mahe̋ndꭉa","Wꜽđr̥ti"],
+  KARANA_BERGERAK: ["Wawa","Walawa","Kolawa","Tꜽŧila","Garadi","Waṇija","Wiṣṭi"],
+  KARANA_TETAP: { 1: "Kimtuǥna", 58: "Sakuni", 59: "Catuspada", 60: "Naga" },
+  MASA: ["Cꜽtꭉa","Wꜽšāꝁa","Jỿéṣṭa","Äsađa","šꭉawaṇa","ƀadꭉawāda","Äsuji","Kar̀t͟tika","Mār̀g͟gašira","Puṣā","Māǥa","ꝑalguṇa"],
+  RASI: ["meša","wr̥ṣaƀa","miŧuna","kar̀k͟ka","siṅha","kanỿā","tūla","mr̥c⃬ꞓika","đanuḥ","makara","kumƀa","mīna"],
+  PAKSA: ["Šukla","Kr̥ṣṇa"],
+  // saptawāra (Minggu = 0) dipakai juga sebagai nama vāra
+  VARA: ["Raditỿa","Soma","äṅgara","Buđa","Wr̥haspati","Šukꭉa","Šanꜽšcara"],
+  SADWARA: ["Tuŋlꜽ","Hariyaŋ","Wurukuŋ","Panir̀w͟wan⸝","Wās⸝","Mawulu"],
+  PANCAWARA: ["Ümanis⸝","Pahiŋ","Pon","Wagꜽ","Kaliww̭ͧan⸝"],
+  WUKU: ["Sinta","Landĕp⸝","Wukir⸝","Kurantil⸝","Tolu","Gumbr̥ᵉ̆g","Wariga","Warigadỿan⸝","Juluŋwaṅi","Suṅsaŋ","Duṅulan⸝","Kuniṅan⸝","Laṅkir⸝","Maḍasiha","Juluŋpujut⸝","Pahaŋ","Kuruwĕlut⸝","Marakiḥ","Tambir⸝","Maḍaŋkuṅan⸝","Mahatal⸝","Wuyꜽ","Manahil⸝","Praŋbakat⸝","Bala","Wugu","Wayaŋ","Kulawu","Ḍukut⸝","Watugunuŋ"],
+  // 15 muhūrta; sistem 15×2: siang (terbit→terbenam) dan malam (terbenam→terbit) masing-masing 15, memakai daftar yang sama
+  MUHURTA: ["rꜷdꭉa","šwéta","mꜽtꭉa","sāraƀaṭa","sāwitꭉa","wꜽrājỿa","wišwāwasu","äƀijit⸝","rꜷhiṇa","bala","wijaya","nꜽriti","baruṇa","somỿa","bago"],
   // urutan bagian siang (1/8) menurut hari, Minggu = 0
   RAHU: [8, 2, 7, 5, 6, 4, 3], YAMA: [5, 4, 3, 2, 1, 7, 6], GULIKA: [7, 6, 5, 4, 3, 2, 1],
 };
+PN.MUHURTA_SIANG = PN.MUHURTA; PN.MUHURTA_MALAM = PN.MUHURTA;
 
 class Panchanga {
   constructor(a) { this.A = a || new AstroEvents(); this._masaCache = null; }
@@ -47,16 +57,12 @@ class Panchanga {
     s.pada = Math.floor(s.bagian * 4) + 1; return s;
   }
   yoga(jd) { return this._span(j => this._n360(this.sidSun(j) + this.sidMoon(j)), 40 / 3, 14.17, jd, i => PN.YOGA[i % 27]); }
-  karana(jd) {
-    return this._span(j => this.A.elongation(j), 6, 12.19, jd, i => {
-      const k = (i % 60) + 1;
-      if (k === 1) return "Kiṃstughna"; if (k === 58) return "Śakuni"; if (k === 59) return "Catuṣpada"; if (k === 60) return "Nāga";
-      return PN.KARANA_BERGERAK[(k - 2) % 7];
-    });
-  }
+  /** Nama karaṇa ke-k (1–60): 1 tetap, 2–57 siklus 7 bergerak, 58–60 tetap. */
+  namaKarana(k) { return PN.KARANA_TETAP[k] || PN.KARANA_BERGERAK[(k - 2) % 7]; }
+  karana(jd) { return this._span(j => this.A.elongation(j), 6, 12.19, jd, i => this.namaKarana((i % 60) + 1)); }
   tithi(jd) {
-    const s = this._span(j => this.A.elongation(j), 12, 12.19, jd, i => { const n = (i % 30) + 1, k = (n - 1) % 15; return k === 14 ? (n === 15 ? "Pūrṇimā" : "Amāvāsyā") : PN.TITHI[k]; });
-    s.paksha = s.n <= 15 ? "Śukla" : "Kṛṣṇa"; return s;
+    const s = this._span(j => this.A.elongation(j), 12, 12.19, jd, i => PN.TITHI[(i % 30) % 15]);
+    s.paksha = s.n <= 15 ? PN.PAKSA[0] : PN.PAKSA[1]; return s;
   }
 
   // ───────── Māsa & Śakavarṣa ─────────
@@ -71,14 +77,25 @@ class Panchanga {
       const r1 = Math.floor(this.sidSun(a) / 30), r2 = Math.floor(this.sidSun(b) / 30);
       c = this._masaCache = { awal: a, akhir: b, adhika: r1 === r2, idx: (r1 + 1) % 12 };
     }
-    const paksha = this.A.elongation(jd) < 180 ? "Śukla" : "Kṛṣṇa";
+    const paksha = this.A.elongation(jd) < 180 ? PN.PAKSA[0] : PN.PAKSA[1];
     return { ...c, nama: PN.MASA[c.idx], paksha, adhika: c.adhika,
-             namaPurnimanta: paksha === "Kṛṣṇa" && !c.adhika ? PN.MASA[(c.idx + 1) % 12] : PN.MASA[c.idx] };
+             namaPurnimanta: paksha === PN.PAKSA[1] && !c.adhika ? PN.MASA[(c.idx + 1) % 12] : PN.MASA[c.idx] };
   }
   /** Tahun Śaka: bertambah di Caitra Śukla Pratipadā (≈ Maret–April). bulanMasehi/tahunMasehi = tanggal lokal. */
   sakaYear(masaIdx, bulanMasehi, tahunMasehi) { return tahunMasehi - ((masaIdx >= 9 && bulanMasehi <= 5) ? 79 : 78); }
   /** Saat Matahari sidereal mencapai bujur `lon` (mis. 0 = Meṣa saṅkrānti) di sekitar jd0. */
   sankranti(lon, jd0) { return this.A._solve(j => this._n180(this.sidSun(j) - lon), jd0, 0.9856); }
+
+  // ───────── Pawukon (kalender Bali, siklus 210 hari) ─────────
+  /**
+   * Wuku, saptawāra, pañcawāra, sadwāra untuk tanggal sipil (tahun, bulan, tanggal Masehi).
+   * Acuan: Minggu 17-12-2023 = awal wuku Sinta (hari ke-0). saptawāra = hari ke-0 mod 7 (Minggu = 0), pañcawāra = (d+1) mod 5 (Ümanis = 0),
+   * sadwāra = d mod 6 (Tuŋlꜽ = 0), wuku = ⌊d/7⌋. Cocok dengan Galungan (Buđa Kaliww̭ͧan⸝, wuku Duṅulan⸝) 28-2-2024 dan 23-4-2025.
+   */
+  pawukon(thn, bln, tgl) {
+    const d = (((Math.round(Date.UTC(thn, bln - 1, tgl) / 864e5 - Date.UTC(2023, 11, 17) / 864e5)) % 210) + 210) % 210, iw = Math.floor(d / 7);
+    return { hariKe: d, noWuku: iw + 1, wuku: PN.WUKU[iw], saptawara: PN.VARA[d % 7], pancawara: PN.PANCAWARA[(d + 1) % 5], sadwara: PN.SADWARA[d % 6], idx: { wuku: iw, saptawara: d % 7, pancawara: (d + 1) % 5, sadwara: d % 6 } };
+  }
 
   // ───────── Lagna (ascendant) ─────────
   /** Bujur ascendant sidereal (derajat) dan rāśi (0 = Meṣa) pada jd di lintang lat, bujur lon. */
