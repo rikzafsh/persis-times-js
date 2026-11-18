@@ -3,32 +3,54 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 <title>PERSIS TIMES JS</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<a class="skip" href="#panels">Lompat ke konten</a>
 <header class="hero"><div class="in">
+<div class="hero-row">
+<div>
 <h1>🕌 PERSIS TIMES JS</h1>
-<p class="sub">Waktu salat, kiblat, fase Bulan, musim, tithi, kalender Hijriah, hilal, dan gerhana — dihitung langsung di peramban tanpa peladen (VSOP87D &amp; ELPMPP02).</p>
+<p class="sub">Waktu salat, kiblat, fase Bulan, musim, pañcāṅga, kalender Hijriah, hilal, dan gerhana — dihitung langsung di peramban tanpa peladen (VSOP87D &amp; ELPMPP02).</p>
+</div>
+<button id="theme" class="iconbtn" type="button" aria-label="Ganti tema tampilan" title="Ganti tema: otomatis → terang → gelap">🌗 <span>otomatis</span></button>
+</div>
 </div></header>
 <main>
 <details class="card" id="locbox" open>
 <summary><span>📍 Lokasi &amp; waktu</span><small id="locsum"></small></summary>
 <div class="grid">
 <label>Kota<select id="city"></select></label>
-<label>Lintang (°, S negatif)<input id="lat" type="number" step="any"></label>
-<label>Bujur (°, T positif)<input id="lon" type="number" step="any"></label>
-<label>Ketinggian (m)<input id="elev" type="number" step="any" value="0"></label>
-<label>Zona waktu (jam)<input id="tz" type="number" step="any"></label>
-<label>Tanggal<input id="date" type="date"></label>
+<label>Lintang (°, S negatif)<input id="lat" type="number" step="any" inputmode="decimal"></label>
+<label>Bujur (°, T positif)<input id="lon" type="number" step="any" inputmode="decimal"></label>
+<label>Ketinggian (m)<input id="elev" type="number" step="any" inputmode="decimal" value="0"></label>
+<label>Zona waktu (jam)<input id="tz" type="number" step="any" inputmode="decimal"></label>
+<div class="field"><label for="date">Tanggal</label><div class="datebox"><button id="dprev" type="button" class="btn2" aria-label="Hari sebelumnya" title="Hari sebelumnya">◀</button><input id="date" type="date"><button id="dnext" type="button" class="btn2" aria-label="Hari berikutnya" title="Hari berikutnya">▶</button></div></div>
 <label>Metode salat<select id="method"></select></label>
-<label>Ihtiyat (menit)<input id="iht" type="number" step="1" value="0"></label>
+<label>Ihtiyat (menit)<input id="iht" type="number" step="1" min="0" inputmode="numeric" value="0"></label>
 </div>
-<button id="apply">Terapkan</button>
+<div class="actions">
+<button id="apply" type="button">Terapkan</button>
+<button id="geo" type="button" class="btn2">📍 Lokasi saya</button>
+<button id="dnow" type="button" class="btn2">Hari ini</button>
+<button id="reset" type="button" class="btn2">Atur ulang</button>
+</div>
+</details>
+<p id="locerr" class="err" role="alert" hidden></p>
+<details class="card help"><summary><span>❓ Cara memakai</span><small>ketuk untuk membuka</small></summary>
+<ul class="find">
+<li>Pilih <b>kota</b> atau isi lintang/bujur sendiri (atau ketuk <b>Lokasi saya</b>), lalu pilih tanggal. Perubahan langsung diterapkan; setelan lokasi tersimpan di peramban ini.</li>
+<li>Geser baris <b>tab</b> di bawah untuk berpindah fitur; tab dihitung saat dibuka sehingga yang berat tidak memperlambat yang lain.</li>
+<li>Arahkan kursor atau <b>ketuk blok/titik/segmen</b> pada grafik untuk rincian waktu (mis. dewata dan maṇḍala pada nakṣatꭉa).</li>
+<li>Tombol <b>🌗</b> di kanan atas mengganti tema: otomatis (mengikuti perangkat), terang, atau gelap.</li>
+<li>Ejaan nama memakai aksara Latin Extended; bila ada kotak kosong, pasang font Junicode, Gentium Plus, Charis SIL, atau FreeSerif.</li>
+</ul>
 </details>
 <nav class="tabs" id="tabs" role="tablist" aria-label="Fitur"></nav>
 <div id="panels"></div>
-<footer>Port JavaScript dari <code>persis_times</code> (Dart, abusabda, MIT). Fase Bulan, musim, dan tithi adalah tambahan yang dihitung dari mesin yang sama.</footer>
+<footer>Port JavaScript dari <code>persis_times</code> (Dart, abusabda, MIT). Fase Bulan, musim, pañcāṅga, dan jadwal lengkap adalah tambahan yang dihitung dari mesin yang sama.</footer>
 </main>
 <!-- urutan penting: 1) data  2) inti & layanan  3) antarmuka (ui.js dulu, main.js terakhir) -->
 <script src="js/data/sun_vsop87d.js"></script>

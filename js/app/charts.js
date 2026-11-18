@@ -68,7 +68,7 @@ const Charts = (() => {
    * type 'bracket': braket berlabel [{a,b,nama,warna,tip}]; label berdekatan disusun berundak
    */
   function dayline(o) {
-    const Wd = 900, L = 106, R = 26, iw = Wd - L - R, axisY = 44, rows = o.rows, UP = { seg: 15, vara: 15, bar: 13, bracket: 16, vbar: 44 }, DN = { seg: 36, vara: 16, bar: 14, bracket: 20, vbar: 45 };
+    const Wd = 900, L = 106, R = 26, iw = Wd - L - R, axisY = 44, rows = o.rows, UP = { seg: 15, vara: 15, bar: 13, bracket: 16, vbar: 44 }, DN = { seg: 36, vara: 36, bar: 14, bracket: 20, vbar: 45 };
     const X = jd => L + (jd - o.t0) / (o.t1 - o.t0) * iw, tw = (t, fs) => String(t).length * 0.6 * fs;
     const fit = (t, w, fs) => { if (tw(t, fs) <= w - 4) return t; const k = Math.floor((w - 4) / (0.6 * fs)) - 1; return k >= 4 ? String(t).slice(0, k) + "…" : ""; };
     let yy = 100, prev = null; const ys = rows.map(r => { const u = UP[r.type] || 15; yy += (prev == null ? u : (DN[prev] + 10 + u)); prev = r.type; return yy; });
@@ -100,7 +100,7 @@ const Charts = (() => {
           if (it.b < o.t1 - 1e-6) s += txt(X(it.b), y0 + 29, o.fmt(it.b), { s: 11, fill: "var(--fg)" });
         });
       } else if (r.type === "vara") {
-        s += "<rect x='" + L + "' y='" + (y0 - 15) + "' width='" + iw + "' height='30' rx='3' fill='" + warna[0] + "'><title>" + esc(r.tip || r.nama) + "</title></rect>" + txt(L + iw / 2, y0 + 5, r.nama, { s: 12.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' ");
+        s += "<rect x='" + L + "' y='" + (y0 - 15) + "' width='" + iw + "' height='30' rx='3' fill='" + warna[0] + "'><title>" + esc(r.tip || r.nama) + "</title></rect>" + txt(L + iw / 2, y0 + 5, r.nama, { s: 12.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' "); s += txt(Wd - R, y0 + 29, "berakhir " + o.fmt(o.t1), { a: "end", s: 11, fill: "var(--fg)" });
       } else if (r.type === "bar" || r.type === "vbar") {
         const hh = r.type === "bar" ? 26 : 88, y1 = y0 - hh / 2;
         r.items.forEach(it => {

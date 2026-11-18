@@ -94,7 +94,14 @@ Validasi: adhika 2001 Āśvina, 2004 Śrāvaṇa, 2007 Jyeṣṭha, 2010 Vaiśā
 kṣaya 1963 (Mārgaśīrṣa), 1983 (Māgha), 2123–24 (Pauṣa). Tab antarmuka: linimasa, frekuensi per māsa, selang antar adhika, kurun, siklus Metonik (`charts.js`, SVG tanpa pustaka luar).
 Tradisi regional bisa berbeda dalam detail (mis. aturan hari perayaan, vāra muhūrta); anggap ini hitungan astronomis, bukan panchang resmi.
 
+## Antarmuka
+- **Tema**: otomatis (mengikuti perangkat), terang, atau gelap lewat tombol 🌗 di kanan atas; dipaksa lewat atribut `data-theme` pada `<html>` dan disimpan.
+- **Lokasi & waktu**: perubahan diterapkan otomatis; validasi masukan dengan pesan galat; tombol tanggal ◀ ▶, "Hari ini", "📍 Lokasi saya" (Geolocation API, atas izin pengguna), dan "Atur ulang"; setelan terakhir tersimpan di `localStorage` (aman bila tidak tersedia).
+- **Tab**: aksesibel (`role=tablist`, ARIA, navigasi ← → Home End), tab aktif digulir ke tengah, indikator sibuk saat menghitung, tab dihitung hanya saat dibuka.
+- **Responsif**: kisi dua kolom di ponsel, tabel dan grafik lebar dapat digeser, target sentuh ≥ 40 px, panel lokasi menciut otomatis di layar sempit, gaya cetak sederhana.
+
 ## Ejaan nama & Pawukon
+Seluruh nama unsur jyotisa diseragamkan huruf kecil. Pada tabel aṅga, wāra/sadwāra/pañcawāra berakhir pada Matahari terbit berikutnya dan wuku pada Matahari terbit hari pertama wuku berikutnya.
 Nama māsa, tiŧi, nakṣatꭉa (beserta déwatā dan maṇḍala), yoga, karaṇa, muhūr̀tta, rāšī, wuku, sadwāra, pañcawāra, saptawāra, dan pakṣa mengikuti daftar ejaan yang diberikan pengguna
 (`PN` di `panchanga_service.js`; urutan = urutan baku, jumlah divalidasi: 15, 27, 27, 27, 27, 12, 12, 7, 6, 5, 30, 15, 2).
 Catatan: tiŧi 15 dan 30 sama-sama "Pañcadašī" (dibedakan pakṣa Šukla/Kr̥ṣṇa); nama karaṇa tetap dipetakan menurut identitas (Sakuni = 58, Catuspada = 59, Naga = 60);

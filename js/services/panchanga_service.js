@@ -27,6 +27,9 @@ const PN = {
   // urutan bagian siang (1/8) menurut hari, Minggu = 0
   RAHU: [8, 2, 7, 5, 6, 4, 3], YAMA: [5, 4, 3, 2, 1, 7, 6], GULIKA: [7, 6, 5, 4, 3, 2, 1],
 };
+// seluruh nama unsur jyotisa diseragamkan menjadi huruf kecil
+for (const k of ["TITHI", "NAKSATRA", "DEWATA", "MANDALA", "YOGA", "KARANA_BERGERAK", "MASA", "RASI", "PAKSA", "VARA", "SADWARA", "PANCAWARA", "WUKU", "MUHURTA"]) PN[k] = PN[k].map(s => s.toLowerCase());
+for (const k of Object.keys(PN.KARANA_TETAP)) PN.KARANA_TETAP[k] = PN.KARANA_TETAP[k].toLowerCase();
 PN.MUHURTA_SIANG = PN.MUHURTA; PN.MUHURTA_MALAM = PN.MUHURTA;
 
 class Panchanga {
