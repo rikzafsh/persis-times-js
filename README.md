@@ -100,6 +100,14 @@ Tradisi regional bisa berbeda dalam detail (mis. aturan hari perayaan, vāra muh
 - **Tab**: aksesibel (`role=tablist`, ARIA, navigasi ← → Home End), tab aktif digulir ke tengah, indikator sibuk saat menghitung, tab dihitung hanya saat dibuka.
 - **Responsif**: kisi dua kolom di ponsel, tabel dan grafik lebar dapat digeser, target sentuh ≥ 40 px, panel lokasi menciut otomatis di layar sempit, gaya cetak sederhana.
 
+## Grafik harian pañcāṅga: slider & prasasti
+Tab Tiŧi & Pañcāṅga memuat slider waktu (resolusi 1 detik, tombol ±1 menit) yang menggeser kursor pada grafik dan **menyorot blok yang berlaku** pada tiap baris.
+Tombol **⏱ Sekarang** melompat ke waktu kini dan mengikutinya tiap detik ("ikuti waktu berjalan"; mati bila slider digeser); bila waktu kini di luar jendela, tanggal dipindah ke hari ini.
+Grafik dapat dimulai pada **Matahari terbit**, **tengah malam**, **tengah hari**, atau **Matahari terbenam** (jendela 24 jam; hari Hindu sebelum/sesudahnya diisi otomatis, mis. wāra dan muhūr̀tta malam sebelum terbit).
+Rangkuman di bawah slider memakai format prasasti:
+`swasti šaka war̀ṣâtīta [tahun], [māsa] māsa, tiŧī [tiŧi], [pakṣa] pakṣa, [sadwāra], [pañcawāra], [saptawāra], wāra, [wuku], [nakṣatꭉa] nakṣatꭉa, [déwatā] déwatā, [maṇḍala] maṇḍala, [yoga] yoga, [karaṇa] karaṇa, [muhūr̀tta] muhūr̀tta, [rāšī] rāšī, ïrika diwasani`.
+Angka tahun šaka dapat dipilih: *atīta* (selesai) = tahun berjalan − 1 (bawaan) atau tahun šaka berjalan. Pada adhika māsa, kata "adhika" ditambahkan di depan nama māsa. Tombol "Salin teks" menyalin rangkuman.
+
 ## Ejaan nama & Pawukon
 Seluruh nama unsur jyotisa diseragamkan huruf kecil. Pada tabel aṅga, wāra/sadwāra/pañcawāra berakhir pada Matahari terbit berikutnya dan wuku pada Matahari terbit hari pertama wuku berikutnya.
 Nama māsa, tiŧi, nakṣatꭉa (beserta déwatā dan maṇḍala), yoga, karaṇa, muhūr̀tta, rāšī, wuku, sadwāra, pañcawāra, saptawāra, dan pakṣa mengikuti daftar ejaan yang diberikan pengguna

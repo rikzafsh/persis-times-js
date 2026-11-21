@@ -59,22 +59,23 @@ const Charts = (() => {
   }
 
   /**
-   * Garis waktu harian berblok (gaya Drik Panchang, tiap unsur satu warna): t0 (terbit) → t1 (terbit berikutnya).
-   * o: {t0, t1, sunrise, sunset, tz, fmt(jd)→"hh:mm", hour12, rows:[{label, type, warna?, items, nama?}]}
-   * type 'seg'    : blok berurutan [{a,b,nama,short?,tip}]; warna = [nuansa1, nuansa2] bergantian; jam pergantian di bawah blok
-   * type 'vara'   : satu blok sepanjang jendela (nama hari)
-   * type 'bar'    : blok berwarna per butir [{a,b,nama,warna,tip}] (mis. Caughaḍiyā)
+   * Garis waktu harian berblok (gaya Drik Panchang, tiap unsur satu warna) untuk jendela 24 jam sembarang [t0, t1] (JD UT).
+   * o: {t0, t1, tz, fmt(jd)→"hh:mm", hour12, idp, siang:[[terbit,terbenam],…], matahari:[{jd,jenis}], rows:[{label, type, warna?, items}]}
+   * type 'seg'    : blok berurutan [{a,b,nama,short?,tip,endLabel?,akhirAsli?}]; nama di dalam blok, jam pergantian di bawah blok
+   * type 'bar'    : blok rendah berwarna per butir [{a,b,nama,warna,tip}] (mis. Caughaḍiyā)
    * type 'vbar'   : blok tinggi dengan nama diputar tegak [{a,b,nama,warna,tip}] (mis. 30 muhūrta)
    * type 'bracket': braket berlabel [{a,b,nama,warna,tip}]; label berdekatan disusun berundak
+   * Blok seg/bar/vbar diberi id "<idp>-<baris>-<butir>" agar dapat disorot; kursor waktu: elemen "<idp>-cur" dan "<idp>-curt".
    */
   function dayline(o) {
-    const Wd = 900, L = 106, R = 26, iw = Wd - L - R, axisY = 44, rows = o.rows, UP = { seg: 15, vara: 15, bar: 13, bracket: 16, vbar: 44 }, DN = { seg: 36, vara: 36, bar: 14, bracket: 20, vbar: 45 };
+    const Wd = 900, L = 106, R = 26, iw = Wd - L - R, axisY = 44, rows = o.rows, idp = o.idp || "pb", UP = { seg: 15, bar: 13, bracket: 16, vbar: 44 }, DN = { seg: 36, bar: 14, bracket: 20, vbar: 45 };
     const X = jd => L + (jd - o.t0) / (o.t1 - o.t0) * iw, tw = (t, fs) => String(t).length * 0.6 * fs;
     const fit = (t, w, fs) => { if (tw(t, fs) <= w - 4) return t; const k = Math.floor((w - 4) / (0.6 * fs)) - 1; return k >= 4 ? String(t).slice(0, k) + "…" : ""; };
     let yy = 100, prev = null; const ys = rows.map(r => { const u = UP[r.type] || 15; yy += (prev == null ? u : (DN[prev] + 10 + u)); prev = r.type; return yy; });
     const H = yy + (DN[prev] || 16) + 14, sep = "stroke='var(--card)' stroke-width='1.6'";
-    let s = "";
-    s += "<rect x='" + X(o.sunrise).toFixed(1) + "' y='" + (axisY - 20) + "' width='" + (X(o.sunset) - X(o.sunrise)).toFixed(1) + "' height='" + (H - axisY + 6) + "' fill='var(--ac2)'/>";
+    const siang = o.siang || [[o.sunrise, o.sunset]], ev = o.matahari || [{ jd: o.t0, jenis: "terbit" }, { jd: o.sunset, jenis: "terbenam" }, { jd: o.t1, jenis: "terbit" }];
+    let s = ""; const hl = [], hlr = (i, k, x, y, w, h) => hl.push("<rect id='" + idp + "-h-" + i + "-" + k + "' x='" + x.toFixed(1) + "' y='" + y + "' width='" + Math.max(0, w).toFixed(1) + "' height='" + h + "' rx='3' fill='none' stroke='#ffc928' stroke-width='3.2' visibility='hidden' pointer-events='none'/>");
+    siang.forEach(([a, b]) => { const xa = X(Math.max(a, o.t0)), xb = X(Math.min(b, o.t1)); if (xb > xa) s += "<rect x='" + xa.toFixed(1) + "' y='" + (axisY - 20) + "' width='" + (xb - xa).toFixed(1) + "' height='" + (H - axisY + 6) + "' fill='var(--ac2)'/>"; });
     s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + axisY + "' y2='" + axisY + "' stroke='var(--mut)' stroke-width='1.4'/>";
     const lh0 = ((((o.t0 + 0.5 + o.tz / 24) % 1) + 1) % 1) * 24;
     for (let h = Math.ceil(lh0 - 1e-9); ; h++) {
@@ -83,9 +84,8 @@ const Charts = (() => {
       s += "<line x1='" + X(jd).toFixed(1) + "' x2='" + X(jd).toFixed(1) + "' y1='" + axisY + "' y2='" + (axisY + 5) + "' stroke='var(--mut)'/>" + txt(X(jd), axisY + 18, lab, { s: 11 });
     }
     const sun = (jd, lab) => { const x = X(jd); return "<path d='M" + (x - 9).toFixed(1) + " " + axisY + " A9 9 0 0 1 " + (x + 9).toFixed(1) + " " + axisY + " Z' fill='#f5a623' stroke='#b8740a' stroke-width='1.2'/>" + txt(x, axisY - 14, lab, { s: 11, fill: "var(--fg)" }); };
-    s += sun(o.t0, o.fmt(o.t0)) + sun(o.sunset, o.fmt(o.sunset)) + sun(o.t1, o.fmt(o.t1));
-    // garis putus-putus penghubung sumbu → blok (digambar di bawah blok agar tak mengiris blok baris lain)
-    rows.forEach((r, i) => { if (r.type === "seg") r.items.forEach(it => { if (it.b < o.t1 - 1e-6) { const x = X(it.b).toFixed(1); s += "<line x1='" + x + "' x2='" + x + "' y1='" + (axisY + 24) + "' y2='" + (ys[i] - 15) + "' stroke='var(--mut)' stroke-width='.9' stroke-dasharray='3 3' opacity='.55'/>"; } }); });
+    ev.filter(e => e.jd >= o.t0 - 1e-6 && e.jd <= o.t1 + 1e-6).forEach(e => { s += sun(e.jd, o.fmt(e.jd)); });
+    rows.forEach((r, i) => { if (r.type === "seg") r.items.forEach(it => { if (it.b < o.t1 - 1e-6 && it.b > o.t0 + 1e-6) { const x = X(it.b).toFixed(1); s += "<line x1='" + x + "' x2='" + x + "' y1='" + (axisY + 24) + "' y2='" + (ys[i] - 15) + "' stroke='var(--mut)' stroke-width='.9' stroke-dasharray='3 3' opacity='.55'/>"; } }); });
     const stagger = (items, y, fs) => { const lv = []; return items.map(it => { const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = tw(it.nama, fs), cx = (xa + xb) / 2, x0 = cx - w / 2, x1 = cx + w / 2; let k = 0; while (lv[k] != null && x0 < lv[k] + 4) k++; lv[k] = x1; return { it, xa, xb, cx, y: y - k * 12 }; }); };
     const bracket = (it, xa, xb, by, cx, ly, fs) => "<path d='M" + xa.toFixed(1) + " " + (by - 5) + " V" + (by + 5) + " M" + xa.toFixed(1) + " " + by + " H" + xb.toFixed(1) + " M" + xb.toFixed(1) + " " + (by - 5) + " V" + (by + 5) + "' stroke='" + it.warna + "' stroke-width='1.6' fill='none'><title>" + esc(it.tip || it.nama) + "</title></path>" + txt(cx, ly, it.nama, { s: fs, fill: it.warna });
     rows.forEach((r, i) => {
@@ -93,29 +93,36 @@ const Charts = (() => {
       s += txt(L - 8, y0 + 4, r.label, { a: "end", s: 11.5, fill: "var(--fg)" });
       if (r.type === "seg") {
         r.items.forEach((it, k) => {
-          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa; let lab = fit(it.nama, w, 11.5);
+          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa; if (w <= 0) return; let lab = fit(it.nama, w, 11.5);
           if (it.short && lab.endsWith("…")) { const f2 = fit(it.short, w, 11.5); if (f2) lab = f2; }
-          s += "<rect x='" + xa.toFixed(1) + "' y='" + (y0 - 15) + "' width='" + w.toFixed(1) + "' height='30' rx='3' fill='" + warna[k % warna.length] + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>" +
-            txt((xa + xb) / 2, y0 + 4.5, lab, { s: 11.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' ");
+          s += "<rect id='" + idp + "-" + i + "-" + k + "' x='" + xa.toFixed(1) + "' y='" + (y0 - 15) + "' width='" + w.toFixed(1) + "' height='30' rx='3' fill='" + warna[k % warna.length] + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>" +
+            txt((xa + xb) / 2, y0 + 4.5, lab, { s: 11.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' pointer-events='none' ");
+          hlr(i, k, xa, y0 - 15, w, 30);
           if (it.b < o.t1 - 1e-6) s += txt(X(it.b), y0 + 29, o.fmt(it.b), { s: 11, fill: "var(--fg)" });
+          else if (it.endLabel) s += txt(xb, y0 + 29, "berakhir " + o.fmt(it.akhirAsli) + (it.akhirAsli > o.t1 + 1e-6 ? " (hari berikutnya)" : ""), { a: "end", s: 11, fill: "var(--fg)" });
         });
-      } else if (r.type === "vara") {
-        s += "<rect x='" + L + "' y='" + (y0 - 15) + "' width='" + iw + "' height='30' rx='3' fill='" + warna[0] + "'><title>" + esc(r.tip || r.nama) + "</title></rect>" + txt(L + iw / 2, y0 + 5, r.nama, { s: 12.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' "); s += txt(Wd - R, y0 + 29, "berakhir " + o.fmt(o.t1), { a: "end", s: 11, fill: "var(--fg)" });
       } else if (r.type === "bar" || r.type === "vbar") {
         const hh = r.type === "bar" ? 26 : 88, y1 = y0 - hh / 2;
-        r.items.forEach(it => {
-          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa, cx = (xa + xb) / 2;
-          s += "<rect x='" + xa.toFixed(1) + "' y='" + y1 + "' width='" + Math.max(0, w).toFixed(1) + "' height='" + hh + "' rx='3' fill='" + it.warna + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>";
-          if (r.type === "bar") s += txt(cx, y0 + 4, fit(it.nama, w, 10), { s: 10, fill: "#fff" });
-          else if (w >= 11) s += txt(cx, y0 + 3.5, it.nama.length > 14 ? it.nama.slice(0, 13) + "…" : it.nama, { s: 9.5, fill: "#fff", rot: -90 });
+        r.items.forEach((it, k) => {
+          const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa, cx = (xa + xb) / 2; if (w <= 0) return;
+          s += "<rect id='" + idp + "-" + i + "-" + k + "' x='" + xa.toFixed(1) + "' y='" + y1 + "' width='" + Math.max(0, w).toFixed(1) + "' height='" + hh + "' rx='3' fill='" + it.warna + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>";
+          hlr(i, k, xa, y1, w, hh);
+          if (r.type === "bar") s += txt(cx, y0 + 4, fit(it.nama, w, 10), { s: 10, fill: "#fff" }).replace("<text ", "<text pointer-events='none' ");
+          else if (w >= 11) s += txt(cx, y0 + 3.5, it.nama.length > 14 ? it.nama.slice(0, 13) + "…" : it.nama, { s: 9.5, fill: "#fff", rot: -90 }).replace("<text ", "<text pointer-events='none' ");
         });
       } else {
         s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + y0 + "' y2='" + y0 + "' stroke='var(--line)'/>";
         stagger(r.items, y0 + 3, 10.5).forEach(g => { s += bracket(g.it, g.xa, g.xb, y0 + 12, g.cx, g.y, 10.5); });
       }
     });
+    s += hl.join("");
+    // kursor waktu (digeser oleh slider)
+    s += "<line id='" + idp + "-cur' x1='" + L + "' x2='" + L + "' y1='" + (axisY - 22) + "' y2='" + (H - 6) + "' stroke='#ffc928' stroke-width='2.4' pointer-events='none'/>" +
+      "<text id='" + idp + "-curt' x='" + L + "' y='10' font-size='11' font-weight='700' fill='#ffc928' text-anchor='middle' pointer-events='none'></text>";
     return svg(H, s, o.title || "Garis waktu harian").replace("viewBox='0 0 " + W + " " + H + "'", "viewBox='0 0 " + Wd + " " + H + "'");
   }
+  /** Posisi-x (satuan viewBox) suatu JD pada garis waktu harian berjendela [t0, t1]; konstanta sama dengan dayline(). */
+  const dayX = (t0, t1, jd) => 106 + (jd - t0) / (t1 - t0) * (900 - 106 - 26);
   const palette = ["#1f9d74", "#d98e04", "#3b7dd8", "#c0392b", "#8e5bd1", "#0e9aa7", "#7a8b2c", "#c2548a", "#6b7280"];
   /**
    * Grafik garis multi-seri. series[{name,color,pts:[nilai|null]}], labels[] (label sumbu-x per titik),
@@ -150,5 +157,5 @@ const Charts = (() => {
     });
     return svg(h, s, o.title || "grafik garis");
   }
-  return { bar, timeline, scatter, lines, dayline, palette, nice };
+  return { bar, timeline, scatter, lines, dayline, dayX, palette, nice };
 })();
