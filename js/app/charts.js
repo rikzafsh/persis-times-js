@@ -160,6 +160,29 @@ const Charts = (() => {
     });
     return svg(H, g + s, o.title || "Garis waktu satu bulan").replace("viewBox='0 0 " + W + " " + H + "'", "viewBox='0 0 " + Wd + " " + H + "'");
   }
+
+  /**
+   * Grafik panjang unsur berurutan. o = {pts:[{x,y,tip,c}], xt:[{x,label}], x0,x1, mean, imax, imin, fmtY, yTitle, labMax, labMin, rot, title}.
+   * Sumbu-y tidak dimulai dari nol agar selisih terlihat; titik terpanjang (merah) dan terpendek (hijau) diberi label.
+   */
+  function durasi(o) {
+    const Wd = 900, L = 64, R = 20, T = 26, B = o.rot ? 54 : 40, h = o.h || 300, iw = Wd - L - R, ih = h - T - B, pts = o.pts, f = o.fmtY || num;
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y), x0 = o.x0 != null ? o.x0 : Math.min(...xs), x1 = o.x1 != null ? o.x1 : Math.max(...xs);
+    const mn = Math.min(...ys), mx = Math.max(...ys), pad = (mx - mn) * 0.18 || 1, st = nice(mx - mn + 2 * pad, 5).step, y0 = Math.floor((mn - pad) / st) * st, y1 = Math.ceil((mx + pad) / st) * st;
+    const X = x => L + (x - x0) / ((x1 - x0) || 1) * iw, Y = v => T + ih - (v - y0) / ((y1 - y0) || 1) * ih;
+    let s = "";
+    for (let v = y0; v <= y1 + 1e-9; v += st) s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + Y(v).toFixed(1) + "' y2='" + Y(v).toFixed(1) + "' stroke='var(--line)'/>" + txt(L - 6, Y(v) + 4, f(v), { a: "end" });
+    (o.xt || []).forEach(t => { s += "<line x1='" + X(t.x).toFixed(1) + "' x2='" + X(t.x).toFixed(1) + "' y1='" + T + "' y2='" + (T + ih) + "' stroke='var(--line)' stroke-dasharray='2 3'/>" + txt(X(t.x), T + ih + (o.rot ? 12 : 16), t.label, { s: 10, rot: o.rot, a: o.rot ? "end" : "middle" }); });
+    s += "<polyline fill='none' stroke='var(--mut)' stroke-opacity='.55' stroke-width='1.2' points='" + pts.map(p => X(p.x).toFixed(1) + "," + Y(p.y).toFixed(1)).join(" ") + "'/>";
+    const r = pts.length > 150 ? 2.2 : pts.length > 60 ? 3 : 4;
+    pts.forEach(p => { s += "<circle cx='" + X(p.x).toFixed(1) + "' cy='" + Y(p.y).toFixed(1) + "' r='" + r + "' fill='" + (p.c || "var(--ac)") + "'><title>" + esc(p.tip || "") + "</title></circle>"; });
+    if (o.mean != null) s += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + Y(o.mean).toFixed(1) + "' y2='" + Y(o.mean).toFixed(1) + "' stroke='var(--warn)' stroke-width='1.6' stroke-dasharray='6 4'/>" + txt(Wd - R, Y(o.mean) - 5, "rata-rata " + f(o.mean), { a: "end", s: 10.5, fill: "var(--warn)" });
+    const mark = (i, col, lab, above) => { if (i == null) return; const p = pts[i], x = X(p.x), y = Y(p.y), a = x > Wd - 150 ? "end" : x < L + 120 ? "start" : "middle";
+      s += "<circle cx='" + x.toFixed(1) + "' cy='" + y.toFixed(1) + "' r='" + (r + 3.5) + "' fill='none' stroke='" + col + "' stroke-width='2.4'/>" + txt(x + (a === "end" ? 6 : a === "start" ? -6 : 0), y + (above ? -(r + 9) : r + 17), lab, { a, s: 11, fill: col }).replace("<text ", "<text font-weight='700' "); };
+    mark(o.imax, "#d9534f", o.labMax || "terpanjang", true); mark(o.imin, "#1f9d74", o.labMin || "terpendek", false);
+    if (o.yTitle) s += txt(14, T + ih / 2, o.yTitle, { rot: -90, s: 10.5 });
+    return svg(h, s, o.title || "Grafik panjang unsur").replace("viewBox='0 0 " + W + " " + h + "'", "viewBox='0 0 " + Wd + " " + h + "'");
+  }
   /** Posisi-x (satuan viewBox) suatu JD pada garis waktu harian berjendela [t0, t1]; konstanta sama dengan dayline(). */
   const dayX = (t0, t1, jd) => 106 + (jd - t0) / (t1 - t0) * (900 - 106 - 26);
   const palette = ["#1f9d74", "#d98e04", "#3b7dd8", "#c0392b", "#8e5bd1", "#0e9aa7", "#7a8b2c", "#c2548a", "#6b7280"];
@@ -196,5 +219,5 @@ const Charts = (() => {
     });
     return svg(h, s, o.title || "grafik garis");
   }
-  return { bar, timeline, scatter, lines, dayline, monthline, dayX, palette, nice };
+  return { bar, timeline, scatter, lines, dayline, monthline, durasi, dayX, palette, nice };
 })();

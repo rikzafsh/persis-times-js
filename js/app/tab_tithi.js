@@ -6,7 +6,7 @@
 (function () {
   const { $, card, fmtDT, fmtD } = UI;
   const p = UI.add({ id: "tithi", label: "Tiŧi & Pañcāṅga", icon: "🪔" });
-  p.innerHTML = "<div class='card'><h2>Grafik harian 24 jam <small>(slider waktu · rangkuman prasasti)</small></h2><div class='grid'><label>Mulai grafik pada<select id='pgw'><option value='terbit' selected>Matahari terbit</option><option value='tengah-malam'>Tengah malam (00:00)</option><option value='tengah-hari'>Tengah hari (12:00)</option><option value='terbenam'>Matahari terbenam</option></select></label><label>Rincian<select id='pgm'><option value='muhurta' selected>Pañcāṅga + lagna-rāšī + 30 muhūr̀tta 15×2 (tanpa waktu baik)</option><option value='panca'>Pañcāṅga saja</option><option value='lengkap'>Lengkap (+ lagna, caughaḍiyā, kāla, muhūrta baik)</option></select></label><label>Sumbu jam<select id='pgf'><option value='24' selected>24 jam</option><option value='12'>12 jam</option></select></label><label>Angka tahun šaka pada prasasti<select id='pgy'><option value='atita' selected>atīta (selesai) = tahun berjalan − 1</option><option value='jalan'>tahun šaka berjalan</option></select></label></div><div id='pgout' style='margin-top:12px'></div></div><div class='card'><h2>Diagram satu bulan <small>(pakṣa · tiŧi · nakṣatꭉa · yoga · wāra · māsa amānta &amp; pūrṇimānta)</small></h2><div class='grid'><label>Rentang<select id='pmm'><option value='lunar' selected>Satu bulan lunar (bulan baru → bulan baru)</option><option value='masehi'>Satu bulan Masehi</option></select></label></div><div class='actions' style='margin-top:8px'><button id='pmprev' type='button' class='btn2' disabled>◀ Bulan sebelumnya</button><button id='pmnext' type='button' class='btn2' disabled>Bulan berikutnya ▶</button></div><div id='pmout' style='margin-top:10px'></div></div><div id='pdet'></div><div class='card'><h2>Kalender Pañcāṅga</h2><div class='grid'><label>Jumlah hari<select id='tn'><option value='7' selected>7 hari</option><option value='15'>15 hari</option><option value='30'>30 hari (±4 dtk)</option></select></label></div></div><div id='tout'></div>";
+  p.innerHTML = "<div class='card'><h2>Grafik harian 24 jam <small>(slider waktu · rangkuman prasasti)</small></h2><div class='grid'><label>Mulai grafik pada<select id='pgw'><option value='terbit' selected>Matahari terbit</option><option value='tengah-malam'>Tengah malam (00:00)</option><option value='tengah-hari'>Tengah hari (12:00)</option><option value='terbenam'>Matahari terbenam</option></select></label><label>Rincian<select id='pgm'><option value='muhurta' selected>Pañcāṅga + lagna-rāšī + 30 muhūr̀tta 15×2 (tanpa waktu baik)</option><option value='panca'>Pañcāṅga saja</option><option value='lengkap'>Lengkap (+ lagna, caughaḍiyā, kāla, muhūrta baik)</option></select></label><label>Sumbu jam<select id='pgf'><option value='24' selected>24 jam</option><option value='12'>12 jam</option></select></label><label>Angka tahun šaka pada prasasti<select id='pgy'><option value='atita' selected>atīta (selesai) = tahun berjalan − 1</option><option value='jalan'>tahun šaka berjalan</option></select></label></div><div id='pgout' style='margin-top:12px'></div></div><div class='card'><h2>Diagram satu bulan <small>(pakṣa · tiŧi · nakṣatꭉa · yoga · wāra · māsa amānta &amp; pūrṇimānta)</small></h2><div class='grid'><label>Rentang<select id='pmm'><option value='lunar' selected>Satu bulan lunar (bulan baru → bulan baru)</option><option value='masehi'>Satu bulan Masehi</option></select></label></div><div class='actions' style='margin-top:8px'><button id='pmprev' type='button' class='btn2' disabled>◀ Bulan sebelumnya</button><button id='pmnext' type='button' class='btn2' disabled>Bulan berikutnya ▶</button></div><div id='pmout' style='margin-top:10px'></div></div><div class='card'><h2>Analisis panjang unsur <small>(tiŧi · nakṣatꭉa · yoga · karaṇa · māsa · saṅkrānti)</small></h2><div class='grid'><label>Unsur<select id='pau'><option value='tithi' selected>Tiŧi</option><option value='nakshatra'>Nakṣatꭉa</option><option value='yoga'>Yoga</option><option value='karana'>Karaṇa</option><option value='masa'>Māsa (bulan lunar) — satu tahun</option><option value='sank'>Saṅkrānti (bulan surya/rāśi) — satu tahun</option></select></label><label>Rentang<select id='par'><option value='masa' selected>Satu māsa (bulan lunar tanggal terpilih)</option><option value='tahun'>Satu tahun Masehi (tahun tanggal terpilih)</option></select></label></div><div class='actions' style='margin-top:8px'><button id='pago' type='button'>Analisis panjang</button></div><div id='paout' style='margin-top:10px'></div></div><div id='pdet'></div><div class='card'><h2>Kalender Pañcāṅga</h2><div class='grid'><label>Jumlah hari<select id='tn'><option value='7' selected>7 hari</option><option value='15'>15 hari</option><option value='30'>30 hari (±4 dtk)</option></select></label></div></div><div id='tout'></div>";
 
   const hmOf = (jd, tz) => fmtDT(jd, tz).split(" ")[1];
   const dayOf = (jd, tz) => fmtDT(jd, tz).split(" ")[0];
@@ -150,6 +150,9 @@
         // wāra harian (hari Hindu: terbit → terbit)
         const hari = []; { const c0 = Math.floor(t0 + 0.5 + tz / 24) - 1; for (let c = c0; ; c++) { const d = new Date((c - 2440587.5 + 0.5) * 864e5), [sr] = sun(L, d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); hari.push({ y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, tg: d.getUTCDate(), sr, pw: P.pawukon(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()) }); if (sr > t1) break; } }
         const warr = (kunci, wr) => hari.slice(0, -1).map((h, i) => ({ a: h.sr, b: hari[i + 1].sr, nama: h.pw[kunci], warna: wr[h.pw.idx[kunci === "wuku" ? "wuku" : kunci] % wr.length], tip: h.pw.sadwara + " · " + h.pw.pancawara + " · " + h.pw.saptawara + " · wuku " + h.pw.wuku + "\n" + h.tg + "/" + h.mo + "/" + h.y + ", " + rg(h.sr, hari[i + 1].sr) })).filter(x => x.b > t0 && x.a < t1);
+        const SS = ["ra", "so", "äŋ", "bu", "wr̥", "šu", "ša"], SP = ["ü", "pa", "po", "wa", "ka"], SD = ["tuŋ", "ha", "wu", "pa", "wā", "ma"];
+        const wara1 = hari.slice(0, -1).map((h, i) => ({ a: h.sr, b: hari[i + 1].sr, nama: SD[h.pw.idx.sadwara] + ", " + SP[h.pw.idx.pancawara] + ", " + SS[h.pw.idx.saptawara], warna: ["#a0522d", "#b9693f"][i % 2],
+          tip: h.pw.sadwara + " · " + h.pw.pancawara + " · " + h.pw.saptawara + " · wuku " + h.pw.wuku + "\n" + h.tg + "/" + h.mo + "/" + h.y + ", " + rg(h.sr, hari[i + 1].sr) })).filter(x => x.b > t0 && x.a < t1);
         const sapta = warr("saptawara", ["#a0522d", "#b9693f"]), panca = warr("pancawara", ["#8a6d3b", "#a98a52"]), sad = warr("sadwara", ["#6b5b3e", "#85744f"]);
         const wuku = []; hari.slice(0, -1).forEach((h, i) => { const l = wuku[wuku.length - 1]; if (l && l.nama === h.pw.wuku) l.b = hari[i + 1].sr; else wuku.push({ a: h.sr, b: hari[i + 1].sr, nama: h.pw.wuku, warna: ["#7a4a2a", "#96623f"][wuku.length % 2], tip: "wuku " + h.pw.wuku + " (ke-" + h.pw.noWuku + ")" }); });
         const wukuIt = wuku.filter(x => x.b > t0 && x.a < t1).map(x => ({ ...x, tip: x.tip + "\n" + rg(x.a, x.b) }));
@@ -160,12 +163,12 @@
         const purn = ml.slice(1).map((m, i) => ({ a: ml[i].F, b: m.F, nama: m.lbl, adhika: m.adhika })).filter(x => x.b > t0 && x.a < t1).map((x, k) => ({ ...x, warna: x.adhika ? "#b5651d" : ["#a14a8a", "#bd68a6"][k % 2], tip: "pūrṇimānta: " + x.nama + "\npurnama → purnama\n" + rg(x.a, x.b) }));
         const marks = []; ml.forEach(m => { marks.push({ jd: m.awal, t: "🌑", tip: "Bulan baru " + fT(m.awal) }, { jd: m.F, t: "🌕", tip: "Purnama " + fT(m.F) }); });
         const wH = ["#5b8def", "#3b6fd1"], rows = [
+          { label: "māsa amānta", type: "seg", items: amanta }, { label: "māsa pūrṇimānta", type: "seg", items: purn },
           { label: "pakṣa", type: "seg", items: paksa.map(x => ({ a: x.a, b: x.b, nama: x.paksha + " pakṣa", warna: WP[x.paksha], tip: x.paksha + " pakṣa\n" + rg(x.awal, x.akhir) })) },
           { label: "tiŧi", type: "vseg", h: 92, items: IT(tithi, wH, s => s.n + " · " + s.nama) },
           { label: "nakṣatꭉa", type: "vseg", h: 112, items: IT(naks, [WARNA.naks[0], WARNA.naks[1]], s => s.nama) },
           { label: "yoga", type: "vseg", h: 84, items: IT(yoga, [WARNA.yoga[0], WARNA.yoga[1]], s => s.nama) },
-          { label: "saptawāra", type: "vseg", h: 76, items: sapta }, { label: "pañcawāra", type: "vseg", h: 72, items: panca }, { label: "sadwāra", type: "vseg", h: 72, items: sad },
-          { label: "wuku", type: "seg", items: wukuIt }, { label: "māsa amānta", type: "seg", items: amanta }, { label: "māsa pūrṇimānta", type: "seg", items: purn }];
+          { label: "wāra", type: "vseg", h: 82, items: wara1 }, { label: "wuku", type: "seg", items: wukuIt }];
         const sel0 = J.kmjd(L.d, L.mo, L.y, 0, tz), svg = Charts.monthline({ t0, t1, tz, rows, marks, sel: [sel0, sel0 + 1], title: "Diagram pañcāṅga satu bulan" });
         // tabel perbandingan amānta vs pūrṇimānta
         const half = paksa.map(x => { const m = P.masa((x.a + x.b) / 2); return "<tr><td>" + x.paksha + " pakṣa<br><small class='num'>" + rg(x.awal, x.akhir) + "</small></td><td><b>" + (m.adhika ? "adhika " : "") + m.nama + "</b></td><td><b>" + (m.adhika ? "adhika " : "") + m.namaPurnimanta + "</b></td><td>" + (m.nama === m.namaPurnimanta ? "sama" : "<span class='tag warn'>berbeda</span>") + "</td></tr>"; }).join("");
@@ -178,7 +181,7 @@
         $("pmout").innerHTML = "<p style='margin:0 0 6px'><b>" + fmtD(t0, tz) + " → " + fmtD(t1 - 1e-6, tz) + "</b> <small>(zona " + tz + ")</small></p>" +
           "<p class='hint-scroll'>↔ geser ke samping untuk melihat seluruh diagram</p><div class='wrap'><div style='min-width:860px'>" + svg + "</div></div>" +
           "<div style='margin:6px 0;font-size:13px'>" + chip(["#b8860b"], "Šukla pakṣa") + chip(["#2b3a67"], "Kr̥ṣṇa pakṣa") + chip(WARNA.tithi, "tiŧi") + chip(WARNA.naks, "nakṣatꭉa") + chip(WARNA.yoga, "yoga") + chip(WARNA.vara, "wāra") + chip(["#2e7d5b"], "māsa amānta") + chip(["#a14a8a"], "māsa pūrṇimānta") + chip(["#b5651d"], "adhika māsa") + "</div>" +
-          "<p class='note'>Pita kuning = tanggal terpilih. 🌑 bulan baru, 🌕 purnama. Sumbu = tanggal sipil lokal; wāra berganti saat Matahari terbit (hari Hindu) dan wuku mengikuti pawukon. Sorot/ketuk blok untuk waktu mulai dan berakhir.</p>" +
+          "<p class='note'>Pita kuning = tanggal terpilih. 🌑 bulan baru, 🌕 purnama. Sumbu = tanggal sipil lokal; Baris wāra: sadwāra, pañcawāra, saptawāra (suku kata pertama), mis. “tuŋ, ka, ra” = Tuŋlꜽ, Kaliwwan, Raditya; nama lengkap ada di tooltip. Wāra berganti saat Matahari terbit (hari Hindu) dan wuku mengikuti pawukon. Sorot/ketuk blok untuk waktu mulai dan berakhir.</p>" +
           card("Perbandingan sistem amānta &amp; pūrṇimānta", cmp, "Amānta: bulan berakhir pada bulan baru (dipakai di India Selatan/Barat dan di aplikasi ini). Pūrṇimānta: bulan berakhir pada purnama (India Utara). Šukla pakṣa selalu bernama sama; Kr̥ṣṇa pakṣa dalam pūrṇimānta sudah masuk māsa berikutnya, sehingga namanya maju satu bulan (kecuali adhika).") +
           "<details><summary><b>Rincian waktu mulai &amp; berakhir</b></summary><div class='wrap'><table><tr><th>aṅga</th><th>nama</th><th>mulai</th><th>berakhir</th></tr>" + tb("tiŧi", tithi) + tb("nakṣatꭉa", naks) + tb("yoga", yoga) + "</table></div></details>";
       } catch (e) { $("pmout").innerHTML = "<p>Gagal: " + e.message + "</p>"; }
@@ -188,6 +191,78 @@
   $("pmm").onchange = () => { if (bAnchor != null) bulanan(); };
   $("pmprev").onclick = () => { if (bWin) { bAnchor = bWin.t0 - ($("pmm").value === "masehi" ? 0.5 : 1); bulanan(); } };
   $("pmnext").onclick = () => { if (bWin) { bAnchor = bWin.t1 + ($("pmm").value === "masehi" ? 0.5 : 1); bulanan(); } };
+
+  // ── analisis panjang unsur (terpanjang, terpendek, rata-rata) ──
+  let aTok = 0;
+  const JED = ms => new Promise(r => setTimeout(r, ms || 0));
+  function fDur(d, hari) {             // d dalam hari
+    if (hari) { const m = Math.round(d * 1440), h = Math.floor(m / 1440), j = Math.floor((m % 1440) / 60); return h + " h " + j + " j " + (m % 60) + " m"; }
+    const m = Math.round(d * 1440); return Math.floor(m / 60) + " j " + (m % 60) + " m";
+  }
+  /** Saat-saat f(jd) melewati kelipatan w pada (t0, t1): [{t, m}] (m = hitungan lintasan); asinkron agar antarmuka tetap hidup. */
+  async function batas(P, f, w, rate, t0, t1, my, info) {
+    const out = [], A = P.A; let v = f(t0), m = Math.floor(v / w) + 1, t = t0 + (m * w - v) / rate, c = 0;
+    for (;;) {
+      t = A._solve(j => P._n180(f(j) - m * w), t, rate, 2e-6); if (t >= t1) break;
+      out.push({ t, m }); m++; t += w / rate;
+      if (++c % 20 === 0) { info("Menghitung… " + Math.min(99, Math.round((t - t0) / (t1 - t0) * 100)) + "%"); await JED(); if (my !== aTok) return null; }
+    }
+    return out;
+  }
+  async function analisis() {
+    const my = ++aTok, L = UI.L(), P = P0 || new Panchanga(), tz = L.tz, J = new JulianDay(), un = $("pau").value, hari = un === "masa" || un === "sank", rng = hari ? "tahun" : $("par").value;
+    const info = t => { if (my === aTok) $("paout").innerHTML = "<p class='note'>" + t + "</p>"; }; info("Menghitung…"); $("pago").disabled = true;
+    try {
+      await JED(20);
+      const sel0 = J.kmjd(L.d, L.mo, L.y, 0, tz); let t0, t1, ket;
+      if (rng === "masa") { const m = P.masa(sel0 + 0.5); t0 = m.awal; t1 = m.akhir; ket = "satu māsa amānta (" + (m.adhika ? "adhika " : "") + m.nama + ")"; }
+      else { t0 = J.kmjd(1, 1, L.y, 0, tz); t1 = J.kmjd(1, 1, L.y + 1, 0, tz); ket = "tahun Masehi " + L.y; }
+      const tex = t1 + (hari ? 45 : 3);
+      let el = [];      // {a, b, d (hari), nama, key, ord, tip, c}
+      const Nm = { tithi: [i => (i % 30 + 1) + " · " + PN.TITHI[(i % 30) % 15], 30], nakshatra: [i => PN.NAKSATRA[i % 27], 27], yoga: [i => PN.YOGA[i % 27], 27], karana: [i => P.namaKarana(i % 60 + 1), 60], sank: [i => PN.RASI[i % 12], 12] };
+      if (un === "masa") {
+        for (const m of P.lunarMonths(t0, t1)) el.push({ a: m.awal, b: m.akhir, d: m.lama, nama: m.nama + (m.jenis === "adhika" ? " (adhika)" : m.jenis === "ksaya" ? " (kṣaya)" : ""), key: m.nama + (m.jenis === "adhika" ? " (adhika)" : ""), ord: m.idx, c: m.jenis === "adhika" ? "#d98e04" : m.jenis === "ksaya" ? "#8e5bd1" : null });
+      } else {
+        const cfg = { tithi: [j => P.A.elongation(j), 12, 12.19], nakshatra: [j => P.sidMoon(j), 40 / 3, 13.18], yoga: [j => P._n360(P.sidSun(j) + P.sidMoon(j)), 40 / 3, 14.17], karana: [j => P.A.elongation(j), 6, 12.19], sank: [j => P.sidSun(j), 30, 0.9856] }[un];
+        const b = await batas(P, cfg[0], cfg[1], cfg[2], t0, tex, my, info); if (!b) return;
+        for (let i = 0; i + 1 < b.length; i++) { if (b[i].t >= t1) break; const k = b[i].m % Nm[un][1]; el.push({ a: b[i].t, b: b[i + 1].t, d: b[i + 1].t - b[i].t, nama: Nm[un][0](k), key: Nm[un][0](k), ord: k }); }
+      }
+      if (my !== aTok) return;
+      if (el.length < 2) { $("paout").innerHTML = "<p class='note'>Data terlalu sedikit pada rentang ini.</p>"; return; }
+      const fm = x => hari ? x.toFixed(4).replace(".", ",") + " hari" : (x * 24).toFixed(3).replace(".", ",") + " jam";
+      const ds = el.map(e => e.d), mean = ds.reduce((a, c) => a + c, 0) / ds.length, sd = Math.sqrt(ds.reduce((a, c) => a + (c - mean) * (c - mean), 0) / ds.length);
+      const iMax = ds.indexOf(Math.max(...ds)), iMin = ds.indexOf(Math.min(...ds)), srt = [...ds].sort((a, c) => a - c), med = srt.length % 2 ? srt[(srt.length - 1) / 2] : (srt[srt.length / 2 - 1] + srt[srt.length / 2]) / 2;
+      el.forEach(e => { e.tip = e.nama + "\n" + fmtDT(e.a, tz, true) + " → " + fmtDT(e.b, tz, true) + "\nlama " + fDur(e.d, hari) + " (" + fm(e.d) + ")"; });
+      const sat = hari ? 1 : 24, fy = v => v.toFixed(1).replace(".", ","), fl = d => fy(d * sat);
+      // sumbu-x
+      const xt = []; const MON = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      if (rng === "tahun") for (let mo = 1; mo <= 12; mo++) xt.push({ x: J.kmjd(1, mo, L.y, 0, tz), label: MON[mo - 1] });
+      else { const nd = Math.ceil(t1 - t0), stp = nd > 20 ? 3 : 2, n0 = Math.ceil(t0 + 0.5 + tz / 24); for (let n = n0; ; n += stp) { const jd = n - 0.5 - tz / 24; if (jd > t1) break; const d = new Date((jd - 2440587.5) * 864e5 + tz * 36e5); xt.push({ x: jd, label: d.getUTCDate() + "/" + (d.getUTCMonth() + 1) }); } }
+      const pts = el.map(e => ({ x: (e.a + e.b) / 2, y: e.d * sat, tip: e.tip, c: e.c }));
+      const svg = Charts.durasi({ pts, xt, x0: t0, x1: un === "masa" ? t1 + 20 : t1, mean: mean * sat, imax: iMax, imin: iMin, fmtY: fy, yTitle: hari ? "panjang (hari)" : "panjang (jam)", labMax: "terpanjang " + fl(ds[iMax]) + (hari ? " h" : " j"), labMin: "terpendek " + fl(ds[iMin]) + (hari ? " h" : " j"), title: "Panjang " + (un === "sank" ? "bulan surya" : un) + " — " + ket });
+      const NAMA = { tithi: "tiŧi", nakshatra: "nakṣatꭉa", yoga: "yoga", karana: "karaṇa", masa: "māsa (bulan lunar)", sank: "bulan surya (rāśi, antar-saṅkrānti)" }[un];
+      const box = (jd, e) => "<div class='card' style='margin:0'><b>" + jd + "</b><br><span style='font-size:18px'>" + fDur(e.d, hari) + "</span><br><small>" + fm(e.d) + "</small><br><b>" + e.nama + "</b><br><small class='num'>" + fmtDT(e.a, tz, true) + " → " + fmtDT(e.b, tz, true) + "</small></div>";
+      const stat = "<div class='grid' style='margin:8px 0'>" + box("Terpanjang", el[iMax]) + box("Terpendek", el[iMin]) +
+        "<div class='card' style='margin:0'><b>Rata-rata</b><br><span style='font-size:18px'>" + fDur(mean, hari) + "</span><br><small>" + fm(mean) + "</small><br><small>median " + fDur(med, hari) + " · simpangan baku " + fDur(sd, hari) + "<br>selisih terpanjang − terpendek " + fDur(ds[iMax] - ds[iMin], hari) + "<br>jumlah " + el.length + " " + (un === "sank" ? "rāśi" : un === "masa" ? "māsa" : "unsur") + "</small></div></div>";
+      // per nama
+      const grp = {}; el.forEach(e => { (grp[e.key] = grp[e.key] || { ord: e.ord, nama: e.key, d: [] }).d.push(e.d); });
+      const gr = Object.values(grp).sort((a, c) => a.ord - c.ord), gmax = Math.max(...gr.map(g => g.d.reduce((a, c) => a + c, 0) / g.d.length));
+      const perNama = "<table><tr><th>" + NAMA + "</th><th>kali</th><th>terpendek</th><th>rata-rata</th><th>terpanjang</th></tr>" + gr.map(g => { const m = g.d.reduce((a, c) => a + c, 0) / g.d.length; return "<tr><td><b>" + g.nama + "</b></td><td class='num'>" + g.d.length + "</td><td class='num'>" + fDur(Math.min(...g.d), hari) + "</td><td class='num'>" + fDur(m, hari) + "</td><td class='num'>" + fDur(Math.max(...g.d), hari) + "</td></tr>"; }).join("") + "</table>";
+      const rinci = "<table><tr><th>#</th><th>" + NAMA + "</th><th>mulai</th><th>berakhir</th><th>lama</th></tr>" + el.slice(0, 800).map((e, i) => "<tr" + (i === iMax || i === iMin ? " class='hl'" : "") + "><td>" + (i + 1) + "</td><td><b>" + e.nama + "</b></td><td class='num'>" + fDT(e.a) + "</td><td class='num'>" + fDT(e.b) + "</td><td class='num'>" + fDur(e.d, hari) + "</td></tr>").join("") + "</table>";
+      function fDT(j) { return fmtDT(j, tz, true); }
+      if (my !== aTok) return;
+      $("paout").innerHTML = "<p style='margin:0 0 6px'><b>" + NAMA.charAt(0).toUpperCase() + NAMA.slice(1) + "</b> — " + ket + " <small>(" + fmtD(t0, tz) + " → " + fmtD(t1 - 1e-6, tz) + ", zona " + tz + ")</small></p>" + stat +
+        "<p class='hint-scroll'>↔ geser ke samping untuk melihat seluruh grafik</p><div class='wrap'><div style='min-width:820px'>" + svg + "</div></div>" +
+        "<p class='note'>Titik = satu " + (un === "masa" ? "māsa" : un === "sank" ? "bulan surya" : "unsur") + " (diletakkan di tengah rentangnya); lingkaran merah = terpanjang, hijau = terpendek, garis putus-putus = rata-rata. Sumbu-y tidak dimulai dari nol agar variasinya terlihat. " +
+        (un === "masa" ? "Oranye = adhika māsa, ungu = kṣaya māsa. " : "") + (un === "sank" ? "Bulan surya = selang antar-saṅkrānti sidereal (Lahiri); terpanjang di sekitar Juni–Juli (Bumi dekat aphelion), terpendek sekitar Desember–Januari. " : "") +
+        "Yang dihitung: unsur yang <i>dimulai</i> dalam rentang (unsur yang sedang berjalan pada awal rentang tidak ikut karena awalnya di luar rentang). Waktu menurut zona " + tz + ".</p>" +
+        "<details><summary><b>Rata-rata per nama</b></summary><div class='wrap'>" + perNama + "</div></details>" +
+        "<details><summary><b>Daftar lengkap" + (el.length > 800 ? " (800 pertama)" : "") + "</b></summary><div class='wrap'>" + rinci + "</div></details>";
+    } catch (e) { $("paout").innerHTML = "<p>Gagal: " + e.message + "</p>"; }
+    finally { $("pago").disabled = false; }
+  }
+  $("pago").onclick = analisis;
+  $("pau").onchange = () => { const h = $("pau").value === "masa" || $("pau").value === "sank"; $("par").disabled = h; };
 
   function draw() {
     const L = UI.L(), A = new AstroEvents(), P = new Panchanga(A), tz = L.tz, N = +$("tn").value || 7;
