@@ -121,6 +121,45 @@ const Charts = (() => {
       "<text id='" + idp + "-curt' x='" + L + "' y='10' font-size='11' font-weight='700' fill='#ffc928' text-anchor='middle' pointer-events='none'></text>";
     return svg(H, s, o.title || "Garis waktu harian").replace("viewBox='0 0 " + W + " " + H + "'", "viewBox='0 0 " + Wd + " " + H + "'");
   }
+
+  /**
+   * Garis waktu satu bulan (sumbu = tanggal sipil lokal). o = {t0,t1 (JD UT), tz, rows, sel:[a,b], marks:[{jd,t}], title}.
+   * rows[i] = {label, type:'seg'|'vseg', h (tinggi vseg), items:[{a,b,nama,warna,tip}]}; seg = label mendatar, vseg = label tegak.
+   */
+  function monthline(o) {
+    const Wd = 900, L = 106, R = 16, iw = Wd - L - R, axisY = 62, sep = "stroke='var(--card)' stroke-width='1.6'";
+    const X = jd => L + (jd - o.t0) / (o.t1 - o.t0) * iw, tw = (t, fs) => String(t).length * 0.6 * fs;
+    const MON = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"], HR = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    let y = axisY + 36; const ys = o.rows.map(r => { const top = y; y += (r.type === "vseg" ? r.h : 30) + 10; return top; }), H = y + 4;
+    const fit = (t, mx, fs, vert) => { t = String(t); const k = Math.floor((mx - 6) / (0.6 * fs)); return t.length <= k ? t : (k >= 4 ? t.slice(0, k - 1) + "…" : ""); };
+    let g = "", s = "";
+    if (o.sel) { const xa = X(Math.max(o.sel[0], o.t0)), xb = X(Math.min(o.sel[1], o.t1)); if (xb > xa) g += "<rect x='" + xa.toFixed(1) + "' y='" + (axisY - 16) + "' width='" + (xb - xa).toFixed(1) + "' height='" + (H - axisY + 10) + "' fill='#ffc928' opacity='.28'/>"; }
+    g += "<line x1='" + L + "' x2='" + (Wd - R) + "' y1='" + axisY + "' y2='" + axisY + "' stroke='var(--mut)' stroke-width='1.4'/>";
+    const n0 = Math.floor(o.t0 + 0.5 + o.tz / 24 + 1e-9); let firstLab = true;
+    for (let n = n0; ; n++) {
+      const jd = n - 0.5 - o.tz / 24; if (jd > o.t1) break;
+      const dt = new Date((jd - 2440587.5) * 864e5 + o.tz * 36e5), a = Math.max(jd, o.t0), b = Math.min(jd + 1, o.t1);
+      if (jd >= o.t0 - 1e-9) g += "<line x1='" + X(jd).toFixed(1) + "' x2='" + X(jd).toFixed(1) + "' y1='" + axisY + "' y2='" + (H - 4) + "' stroke='var(--line)' stroke-width='.8' opacity='.7'/>";
+      if (X(b) - X(a) >= 12) {
+        const cx = (X(a) + X(b)) / 2, dd = dt.getUTCDate();
+        g += txt(cx, axisY + 14, String(dd), { s: 11, fill: "var(--fg)" }) + txt(cx, axisY + 26, HR[dt.getUTCDay()], { s: 8.5, fill: dt.getUTCDay() === 5 ? "var(--ac)" : "var(--mut)" });
+        if (dd === 1 || firstLab) g += txt(X(a) + 2, axisY - 30, MON[dt.getUTCMonth()] + " " + dt.getUTCFullYear(), { s: 11.5, a: "start", fill: "var(--fg)" }).replace("<text ", "<text font-weight='700' ");
+        firstLab = false;
+      }
+    }
+    (o.marks || []).filter(m => m.jd >= o.t0 && m.jd <= o.t1).forEach(m => { g += "<text x='" + X(m.jd).toFixed(1) + "' y='" + (axisY - 8) + "' font-size='14' text-anchor='middle'><title>" + esc(m.tip || "") + "</title>" + m.t + "</text>"; });
+    o.rows.forEach((r, i) => {
+      const y0 = ys[i], h = r.type === "vseg" ? r.h : 30;
+      s += txt(L - 8, y0 + h / 2 + 4, r.label, { a: "end", s: 11.5, fill: "var(--fg)" });
+      r.items.forEach(it => {
+        const xa = X(Math.max(it.a, o.t0)), xb = X(Math.min(it.b, o.t1)), w = xb - xa; if (w <= 0.5) return;
+        s += "<rect x='" + xa.toFixed(1) + "' y='" + y0 + "' width='" + w.toFixed(1) + "' height='" + h + "' rx='3' fill='" + it.warna + "' " + sep + "><title>" + esc(it.tip || it.nama) + "</title></rect>";
+        if (r.type === "vseg") { if (w >= 11) s += txt((xa + xb) / 2, y0 + h / 2 + 3.5, fit(it.nama, h, 9.5), { s: 9.5, fill: "#fff", rot: -90 }).replace("<text ", "<text pointer-events='none' "); }
+        else { const lab = fit(it.nama, w, 11.5); if (lab) s += txt((xa + xb) / 2, y0 + 19, lab, { s: 11.5, fill: "#fff" }).replace("<text ", "<text font-weight='600' pointer-events='none' "); }
+      });
+    });
+    return svg(H, g + s, o.title || "Garis waktu satu bulan").replace("viewBox='0 0 " + W + " " + H + "'", "viewBox='0 0 " + Wd + " " + H + "'");
+  }
   /** Posisi-x (satuan viewBox) suatu JD pada garis waktu harian berjendela [t0, t1]; konstanta sama dengan dayline(). */
   const dayX = (t0, t1, jd) => 106 + (jd - t0) / (t1 - t0) * (900 - 106 - 26);
   const palette = ["#1f9d74", "#d98e04", "#3b7dd8", "#c0392b", "#8e5bd1", "#0e9aa7", "#7a8b2c", "#c2548a", "#6b7280"];
@@ -157,5 +196,5 @@ const Charts = (() => {
     });
     return svg(h, s, o.title || "grafik garis");
   }
-  return { bar, timeline, scatter, lines, dayline, dayX, palette, nice };
+  return { bar, timeline, scatter, lines, dayline, monthline, dayX, palette, nice };
 })();

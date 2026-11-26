@@ -8,7 +8,8 @@
   const P1 = UI.add({ id: "hijriah", label: "Hijriah & Hilal", icon: "🌙" }), P2 = UI.add({ id: "peta", label: "Peta Hilal", icon: "🗺️" });
   P1.innerHTML = "<div id='hcal'></div>" +
     "<div class='card'><h2>Perbandingan kalender Hijriah &amp; Jawa</h2><p class='note'>Satu bulan Hijriah penuh, dari tanggal 1 variasi paling awal sampai akhir bulan variasi paling akhir, berdasarkan tanggal terpilih.</p>" +
-    "<button id='kcgo'>Bandingkan kalender</button><div id='kcout' class='wrap' style='margin-top:10px'></div></div>" +
+    "<div style='margin:8px 0;font-size:13px'><label style='display:inline-flex;gap:5px;align-items:center;margin-right:14px'><input type='checkbox' id='kcsk' checked> Puasa Senin–Kamis</label><label style='display:inline-flex;gap:5px;align-items:center'><input type='checkbox' id='kcab' checked> Puasa Ayyamulbid</label></div>" +
+    "<button id='kcgo'>Bandingkan kalender</button> <button id='kcprev' disabled>◀ Bulan sebelumnya</button> <button id='kcnext' disabled>Bulan berikutnya ▶</button><div id='kcout' class='wrap' style='margin-top:10px'></div></div>" +
     "<div class='card'><h2>Hisab awal bulan Hijriah &amp; visibilitas hilal</h2><div class='grid'>" +
     "<label>Bulan yang dihisab<select id='hb'></select></label>" +
     "<label>Tahun Hijriah<input id='ht' type='number' step='1'></label>" +
@@ -121,7 +122,7 @@
     return { d: c - tb[k].c + 1, m: tb[k].m, y: tb[k].y };
   }
   /** Hukum puasa pada satu hari: {k: "wajib"|"sunah"|"makruh"|"haram"|"", t: keterangan}. */
-  function hukumPuasa(x, hari, panjangBln) {
+  function hukumPuasa(x, hari, panjangBln, opt) {
     const d = x.d, m = x.m, sunah = [], haram = [];
     if (m === 10 && d === 1) haram.push("Idulfitri");
     if (m === 12 && d === 10) haram.push("Iduladha");
@@ -129,19 +130,19 @@
     if (haram.length) return { k: "haram", t: "Haram: " + haram.join(", ") };
     if (m === 9) return { k: "wajib", t: "Puasa wajib Ramadan" };
     if (m === 8 && panjangBln && d >= 16) return { k: "makruh", t: d === panjangBln ? "Makruh: Hari Syak (akhir Syaban)" : "Makruh: puasa setelah pertengahan Syaban" };
-    if (hari === 0) sunah.push("Senin"); if (hari === 3) sunah.push("Kamis");
-    if (d >= 13 && d <= 15) sunah.push("Ayyamulbid");
+    if (opt.sk) { if (hari === 0) sunah.push("Senin"); if (hari === 3) sunah.push("Kamis"); }
+    if (opt.ab && d >= 13 && d <= 15) sunah.push("Ayyamulbid");
     if (m === 1 && d === 9) sunah.push("Tasua"); if (m === 1 && d === 10) sunah.push("Asyura");
     if (m === 10 && d >= 2 && d <= 7) sunah.push("Syawal");
     if (m === 12 && d >= 1 && d <= 7) sunah.push("Awal Zulhijah");
     if (m === 12 && d === 8) sunah.push("Tarwiah"); if (m === 12 && d === 9) sunah.push("Arafah");
-    if (sunah.length) return { k: "sunah", t: "Sunah: " + sunah.join(", ") };
+    if (sunah.length) return { k: "sunah", n: sunah.length, t: "Sunah" + (sunah.length > 1 ? " (" + sunah.length + " sebab)" : "") + ": " + sunah.join(", ") };
     if (hari === 4) return { k: "makruh", t: "Makruh: Jumat" };
     return { k: "", t: "" };
   }
-  const WARNA_PS = { wajib: ["#3b82d6", "#fff"], sunah: ["#46b36b", "#fff"], makruh: ["#f2c744", "#222"], haram: ["#d9534f", "#fff"] };
-  function hitungBanding() {
-    const L = UI.L(), jdn = new JulianDay(), cal = new CalendarService(), c0 = cjdnOf(L.d, L.mo, L.y);
+  const WARNA_PS = { wajib: ["#3b82d6", "#fff"], sunah: ["#8fd3a6", "#10381f"], makruh: ["#f2c744", "#222"], haram: ["#d9534f", "#fff"] };
+  function hitungBanding(c0) {
+    const jdn = new JulianDay(), cal = new CalendarService();
     const W0 = c0 - 75, W1 = c0 + 75, ar = (c, l, o) => jdn.cjdnkh(c, { hCalE: 2, hCalL: l, optResult: o });
     // bulan-bulan Hijriah yang perlu dihisab (jendela ± margin), cukup perkiraan dari Aritmetis II
     let k0 = 1e9, k1 = -1e9;
@@ -168,6 +169,11 @@
       if (best) { cA = Math.min(cA, cs[best.i]); cB = Math.max(cB, cs[best.j]); }
     });
     const panjang = peta.map(r => { const o = {}; r.forEach(x => { if (x) { const k = x.y * 12 + x.m; o[k] = Math.max(o[k] || 0, x.d); } }); return o; });
+    return { peta, panjang, cs, cA, cB, mT, W0 };
+  }
+  const WARNA_SUNAH = ["#8fd3a6", "#2f9e5a", "#14703a"];      // 1, 2, ≥3 sebab sunah
+  function renderBanding(R) {
+    const { peta, panjang, cA, cB, mT, W0 } = R, opt = { sk: $("kcsk").checked, ab: $("kcab").checked };
     let h = "<table class='kcal'><thead><tr><th>Kalender</th>";
     for (let c = cA; c <= cB; c++) { const t = masehi(c); h += "<th title='" + HARI[c % 7] + ", " + t.d + "/" + pad(t.m) + "/" + t.y + "'>" + t.d + "/" + pad(t.m) + "</th>"; }
     h += "</tr></thead><tbody>";
@@ -176,21 +182,29 @@
       for (let c = cA; c <= cB; c++) {
         const x = r[c - W0], t = masehi(c);
         if (!x) { h += "<td>—</td>"; continue; }
-        const hk = hukumPuasa(x, c % 7, panjang[v][x.y * 12 + x.m]), w = WARNA_PS[hk.k], jv = v === 8;
+        const hk = hukumPuasa(x, c % 7, panjang[v][x.y * 12 + x.m], opt), w = hk.k === "sunah" ? [WARNA_SUNAH[Math.min(hk.n, 3) - 1], hk.n > 1 ? "#fff" : "#10381f"] : WARNA_PS[hk.k], jv = v === 8;
         const tip = HARI[c % 7] + ", " + t.d + "/" + pad(t.m) + "/" + t.y + " M = " + x.d + " " + (jv ? BULAN_JAWA : BULAN)[x.m - 1] + " " + x.y + (jv ? " J" : " H") + " (" + KAL_NAMA[v] + ")" + (hk.t ? " — " + hk.t : "");
         h += "<td title='" + tip + "' style='" + (w ? "background:" + w[0] + ";color:" + w[1] + ";" : "") + (x.d === 1 ? "font-weight:700;border-left:2px solid #333;" : "") + "'>" + x.d + "</td>";
       }
       h += "</tr>";
     });
-    const lg = [["wajib", "Puasa wajib (Ramadan)"], ["sunah", "Puasa sunah"], ["makruh", "Makruh"], ["haram", "Haram"]].map(a => "<span style='display:inline-block;width:12px;height:12px;background:" + WARNA_PS[a[0]][0] + ";border-radius:2px;margin:0 4px -1px 0'></span>" + a[1]).join(" &nbsp; ");
+    const lg = [[WARNA_PS.wajib[0], "Puasa wajib (Ramadan)"], [WARNA_SUNAH[0], "Sunah"], [WARNA_SUNAH[1], "Sunah ganda (2 sebab)"], [WARNA_SUNAH[2], "Sunah 3 sebab"], [WARNA_PS.makruh[0], "Makruh"], [WARNA_PS.haram[0], "Haram"]].map(a => "<span style='display:inline-block;width:12px;height:12px;background:" + a[0] + ";border-radius:2px;margin:0 4px -1px 0'></span>" + a[1]).join(" &nbsp; ");
     return "<p style='font-size:13px;margin:0 0 6px'><b>" + (BULAN[mT - 1]) + "</b> — " + lg + "</p><div style='overflow-x:auto'>" + h + "</tbody></table></div>" +
       "<p class='note'>Sorot (atau ketuk) sel untuk tanggal lengkap dan keterangan. Kolom: tanggal/bulan Masehi. Garis tebal di kiri sel = tanggal 1. Mataraman memakai nomor bulan Jawa (Sura = Muharram). Hisab (MABIMS, Ummul Qura, Wujudul Hilal, KHGT) memakai kriteria &amp; lokasi bawaan tiap kalender, bukan lokasi di formulir; Aritmetis I–IV = pola kabisat 1–4 (epoch Jumat).<br>" +
-      "Prioritas: haram &gt; wajib &gt; makruh Syaban (16 s.d. akhir, termasuk Hari Syak) &gt; sunah (Senin, Kamis, Ayyamulbid 13–15, Tasua, Asyura, Syawal 2–7, Zulhijah 1–9) &gt; Jumat (makruh bila tidak bertepatan puasa sunah). Haram: 1 Syawal, 10–13 Zulhijah. Penilaian dilakukan per variasi dengan tanggalnya sendiri.</p>";
+      "Prioritas: haram &gt; wajib &gt; makruh Syaban (16 s.d. akhir, termasuk Hari Syak) &gt; sunah (Senin, Kamis, Ayyamulbid 13–15, Tasua, Asyura, Syawal 2–7, Zulhijah 1–9) &gt; Jumat (makruh bila tidak bertepatan puasa sunah). Haram: 1 Syawal, 10–13 Zulhijah. Sunah yang bertemu lebih dari satu sebab (mis. Senin + Ayyamulbid) diberi hijau lebih pekat; makruh tidak ditumpuk. Penilaian dilakukan per variasi dengan tanggalnya sendiri.</p>";
   }
-  $("kcgo").onclick = () => {
-    $("kcout").innerHTML = "Menghitung…";
-    setTimeout(() => { try { $("kcout").innerHTML = hitungBanding(); } catch (e) { $("kcout").innerHTML = "<p>" + e.message + "</p>"; } }, 20);
-  };
+  let kcState = null;
+  function jalankanBanding(anchor) {
+    $("kcout").innerHTML = "Menghitung…"; ["kcgo", "kcprev", "kcnext"].forEach(i => { $(i).disabled = true; });
+    setTimeout(() => {
+      try { kcState = hitungBanding(anchor); $("kcout").innerHTML = renderBanding(kcState); } catch (e) { $("kcout").innerHTML = "<p>" + e.message + "</p>"; }
+      $("kcgo").disabled = false; $("kcprev").disabled = $("kcnext").disabled = !kcState;
+    }, 20);
+  }
+  $("kcgo").onclick = () => { const L = UI.L(); jalankanBanding(cjdnOf(L.d, L.mo, L.y)); };
+  $("kcprev").onclick = () => kcState && jalankanBanding(kcState.cA - 5);      // 5 hari sebelum awal paling awal → pasti bulan sebelumnya
+  $("kcnext").onclick = () => kcState && jalankanBanding(kcState.cB + 5);      // 5 hari setelah akhir paling akhir → pasti bulan berikutnya
+  ["kcsk", "kcab"].forEach(i => { $(i).onchange = () => { if (kcState) $("kcout").innerHTML = renderBanding(kcState); }; });
   // tanggal Hijriah pada tanggal terpilih (tiga kriteria)
   UI.onRender("hijriah", () => {
     const L = UI.L(), c = new CalendarService(), f = s => String(s).split("|").pop().trim();
