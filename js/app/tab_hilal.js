@@ -7,6 +7,9 @@
   const BULAN = ["Al-Muharram","Shafar","Rabiul Awwal","Rabiul Akhir","Jumadal Ula","Jumadal Akhirah","Rajab","Syaban","Ramadhan","Syawwal","Zulqadah","Zulhijjah"];
   const P1 = UI.add({ id: "hijriah", label: "Hijriah & Hilal", icon: "🌙" }), P2 = UI.add({ id: "peta", label: "Peta Hilal", icon: "🗺️" });
   P1.innerHTML = "<div id='hcal'></div>" +
+    "<div class='card'><h2>Perbandingan kalender Hijriah &amp; Jawa</h2><div class='grid'>" +
+    "<label>Jumlah hari (mulai tanggal terpilih)<input id='kcn' type='number' step='1' min='1' max='90' value='30'></label></div>" +
+    "<button id='kcgo'>Bandingkan kalender</button><div id='kcout' class='wrap' style='margin-top:10px'></div></div>" +
     "<div class='card'><h2>Hisab awal bulan Hijriah &amp; visibilitas hilal</h2><div class='grid'>" +
     "<label>Bulan yang dihisab<select id='hb'></select></label>" +
     "<label>Tahun Hijriah<input id='ht' type='number' step='1'></label>" +
@@ -106,6 +109,48 @@
     return ["A|Mata telanjang", "B|Alat optik, mungkin mata", "C|Alat optik saja", "D|Tidak terlihat"].map(s => { const [k, t] = s.split("|"); return "<span style='display:inline-block;width:11px;height:11px;background:" + WARNA[k] + ";margin-right:4px;border-radius:2px'></span>" + k + " " + t; }).join(" &nbsp; ") +
       "<br><small>Ijtimak geosentris: " + fmtJD(pre.jdIjtimak, 0) + " UT. Zona waktu tiap sel = bujur/15. Mode “pertama setelah ijtimak” memajukan sel yang Magribnya mendahului ijtimak ke hari berikutnya. Garis kisi tiap 30°; titik merah = lokasi Anda. Peta tanpa garis pantai (tidak ada data peta di pustaka).</small>";
   }
+
+  // ---- perbandingan berbagai kalender: kolom = tanggal Masehi, baris = varian kalender ----
+  const KAL_NAMA = ["MABIMS", "Ummul Qura", "Wujudul Hilal", "Aritmetis I", "Aritmetis II", "Aritmetis III", "Aritmetis IV", "Mataraman"];
+  const cjdnOf = (d, m, y) => Math.floor(new JulianDay().kmjd(d, m, y) + 0.5);
+  function awalBulanTabel(fn, y0, y1) {        // daftar awal bulan hisab [{c: CJDN, m, y}] untuk tahun Hijriah y0..y1
+    const out = [];
+    for (let y = y0; y <= y1; y++) for (let m = 1; m <= 12; m++) out.push({ c: Math.floor(fn(m, y) + 0.5), m, y });
+    return out.sort((a, b) => a.c - b.c);
+  }
+  function tglDariTabel(tb, c) {              // tanggal Hijriah untuk CJDN c; null bila di luar cakupan
+    let k = -1; for (let i = 0; i < tb.length; i++) if (tb[i].c <= c) k = i; else break;
+    if (k < 0 || k === tb.length - 1) return null;
+    return { d: c - tb[k].c + 1, m: tb[k].m, y: tb[k].y };
+  }
+  function hitungBanding() {
+    const L = UI.L(), n = Math.max(1, Math.min(90, Math.floor(+$("kcn").value) || 30)), jdn = new JulianDay();
+    const c0 = cjdnOf(L.d, L.mo, L.y), tgl = [];
+    for (let i = 0; i < n; i++) {
+      const dt = new Date((c0 + i - 2440588) * 864e5);    // CJDN → tanggal Masehi (UTC)
+      tgl.push({ c: c0 + i, d: dt.getUTCDate(), m: dt.getUTCMonth() + 1, y: dt.getUTCFullYear() });
+    }
+    const hY = c => jdn.cjdnkh(c, { hCalE: 2, hCalL: 2, optResult: "THNH" });
+    const y0 = hY(c0) - 1, y1 = hY(c0 + n) + 1, cal = new CalendarService();
+    const tbl = [cal.abqMabims.bind(cal), cal.abqUmmulQura.bind(cal), cal.abqWujudulHilal.bind(cal)].map(f => awalBulanTabel(f, y0, y1));
+    const hijriah = [0, 1, 2].map(i => tgl.map(t => tglDariTabel(tbl[i], t.c)));
+    const aritmetis = [1, 2, 3, 4].map(l => tgl.map(t => ({
+      d: jdn.cjdnkh(t.c, { hCalE: 2, hCalL: l, optResult: "TGLH" }), m: jdn.cjdnkh(t.c, { hCalE: 2, hCalL: l, optResult: "BLNH" }), y: jdn.cjdnkh(t.c, { hCalE: 2, hCalL: l, optResult: "THNH" }) })));
+    const jawa = [tgl.map(t => { const j = jd2jawa(t.c - 0.5); return { d: j.tanggalJawa, m: j.bulanJawa, y: j.tahunJawa }; })];
+    const data = [...hijriah, ...aritmetis, ...jawa];
+    const HARI = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    let h = "<table style='font-size:12px;white-space:nowrap'><thead><tr><th style='text-align:left;position:sticky;left:0;background:var(--card,#fff)'>Kalender</th>" +
+      tgl.map(t => "<th style='text-align:center'>" + HARI[(t.c + 1) % 7] + "<br>" + t.d + "/" + pad(t.m) + "/" + String(t.y).slice(-2) + "</th>").join("") + "</tr></thead><tbody>";
+    data.forEach((r, i) => {
+      h += "<tr><td style='position:sticky;left:0;background:var(--card,#fff);font-weight:600'>" + KAL_NAMA[i] + "</td>" + r.map(x => x ?
+        "<td style='text-align:center" + (x.d === 1 ? ";background:rgba(46,158,91,.22);font-weight:700" : "") + "'>" + x.d + "/" + x.m + "/" + x.y + "</td>" : "<td style='text-align:center'>—</td>").join("") + "</tr>";
+    });
+    return h + "</tbody></table><p class='note'>Format tanggal/bulan/tahun (bulan berupa nomor; Jawa: 1 = Sura). Sel hijau = tanggal 1 (awal bulan). Hijriah hisab (MABIMS, Ummul Qura, Wujudul Hilal) memakai kriteria &amp; lokasi bawaan tiap kalender, bukan lokasi di formulir. Aritmetis I–IV = pola tahun kabisat 1–4 (epoch Jumat, 16 Juli 622 M); Mataraman = kalender Jawa Sultan Agungan. Kolom: tanggal Masehi (dd/mm/yy), dari tanggal terpilih.</p>";
+  }
+  $("kcgo").onclick = () => {
+    $("kcout").innerHTML = "Menghitung…";
+    setTimeout(() => { try { $("kcout").innerHTML = hitungBanding(); } catch (e) { $("kcout").innerHTML = "<p>" + e.message + "</p>"; } }, 20);
+  };
   // tanggal Hijriah pada tanggal terpilih (tiga kriteria)
   UI.onRender("hijriah", () => {
     const L = UI.L(), c = new CalendarService(), f = s => String(s).split("|").pop().trim();
