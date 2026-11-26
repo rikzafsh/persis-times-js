@@ -76,3 +76,5 @@ footer{color:var(--mut);font-size:12px;padding:12px 0 24px}
 }
 @media (max-width:380px){.grid{grid-template-columns:1fr}}
 @media print{.tabs,.hero .iconbtn,.actions,.help,#locbox{display:none}.panel[hidden]{display:block}body{background:#fff;color:#000}}
+.kcal{border-collapse:collapse;font-size:12px;white-space:nowrap}.kcal th,.kcal td{padding:3px 5px;text-align:center;border:1px solid var(--line);min-width:22px}
+.kcal tbody th{text-align:left;position:sticky;left:0;background:var(--card);z-index:1}.kcal thead th{font-weight:600}
