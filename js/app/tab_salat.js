@@ -27,6 +27,7 @@
   const imsak = () => { const v = parseInt($("imsakmin").value, 10); return Number.isFinite(v) ? Math.min(120, Math.max(0, v)) : 10; };
   const nilai = x => x && x.isNormal ? hms(x.time) : "<small>" + (STATUS_KET[x && x.status] || "—") + "</small>";
   const jam = h => h == null ? "<small>tidak ada pada tanggal ini</small>" : hms(h);
+  const durasi = h => h == null ? "<small>tidak dapat dihitung</small>" : (h >= 24 - 1e-9 ? "24:00:00" : hms(h));   // 24 jam tidak boleh tampil 00:00:00
 
   function draw() {
     const L = UI.L(), J = new JadwalLengkap(), n = imsak(), I = L.iht, R = J.hitung(L.d, L.mo, L.y, L, { imsakMenit: n, iht: I }), K = J.kriteria(L.d, L.mo, L.y, L, { imsakMenit: n, iht: I }), M = L.method;
@@ -50,7 +51,7 @@
       mt("Fajar astronomis", "Matahari −18°", jam(A.fajarAstro)) + mt("Fajar nautis", "Matahari −12°", jam(A.fajarNaut)) + mt("Fajar sipil", "Matahari −6°", jam(A.fajarSipil)) +
       mt("<b>Matahari terbit</b> (sunrise)", "tepi atas menyentuh ufuk", nilai(H.syuruk)) + mt("<b>Transit Matahari</b> (istiwa)", "kulminasi", nilai(H.zuhur)) + mt("<b>Matahari terbenam</b> (sunset)", "tepi atas menyentuh ufuk", nilai(H.magrib)) +
       mt("Senja sipil", "Matahari −6°", jam(A.senjaSipil)) + mt("Senja nautis", "Matahari −12°", jam(A.senjaNaut)) + mt("Senja astronomis", "Matahari −18°", jam(A.senjaAstro)) +
-      mt("Lama siang", "terbit → terbenam", jam(A.lamaSiang)) + mt("Lama malam", "terbenam → terbit", jam(A.lamaMalam)) +
+      mt("Lama siang", "terbit → terbenam", durasi(A.lamaSiang)) + mt("Lama malam", "terbenam → terbit", durasi(A.lamaMalam)) +
       mt("<b>Bulan terbit</b> (moonrise)", "", jam(A.bulanTerbit)) + mt("<b>Bulan transit</b>", "Bulan di meridian", jam(A.bulanTransit)) + mt("<b>Bulan terbenam</b> (moonset)", "", jam(A.bulanTerbenam)) + "</table>",
       "Fajar/senja memakai sudut Matahari di bawah ufuk (−6° sipil, −12° nautis, −18° astronomis). Bulan bisa tidak terbit/terbenam pada satu tanggal karena rata-rata terbit ±50 menit lebih lambat tiap hari. Semua jam zona " + L.tz + ".");
 
@@ -95,8 +96,9 @@
         return { name: NAMA[k], abs, pts: mode === "delta" ? abs.map(v => v == null ? null : (v - first) * 60) : abs };
       });
       const ring = series.map((s, x) => {
+        const fm = h => keys[x].startsWith("lama") ? durasi(h) : hms(h);
         const v = s.abs.filter(a => a != null), a = v[0], b = v[v.length - 1];
-        return "<tr><td><span style='color:" + Charts.palette[x % Charts.palette.length] + "'>●</span> <b>" + s.name + "</b></td><td class='num'>" + (v.length ? hms(a) : "—") + "</td><td class='num'>" + (v.length ? hms(b) : "—") + "</td><td class='num'>" + (v.length > 1 ? sgn(b - a) : "—") + "</td></tr>";
+        return "<tr><td><span style='color:" + Charts.palette[x % Charts.palette.length] + "'>●</span> <b>" + s.name + "</b></td><td class='num'>" + (v.length ? fm(a) : "—") + "</td><td class='num'>" + (v.length ? fm(b) : "—") + "</td><td class='num'>" + (v.length > 1 ? sgn(b - a) : "—") + "</td></tr>";
       }).join("");
       const ket = mode === "delta" ? "Selisih (menit) terhadap hari pertama; garis nol = hari pertama." : mode === "panel" ? "Tiap waktu memakai skala sumbu sendiri agar perubahannya terlihat; jam zona " + L.tz + " (hisab mentah)." : "Jam pada zona " + L.tz + " (hisab mentah, tanpa ihtiyat; lompatan lewat tengah malam disambung).";
       const pal = x => Charts.palette[x % Charts.palette.length], judul = "Perubahan " + GRUP[key][0].toLowerCase() + " selama " + N + " hari";

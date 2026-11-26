@@ -55,7 +55,13 @@ class JadwalLengkap {
       fajarAstro: () => v(ws.subuh(d, mo, y, lon, lat, tz, -18)), fajarNaut: () => v(ws.subuh(d, mo, y, lon, lat, tz, -12)), fajarSipil: () => v(ws.subuh(d, mo, y, lon, lat, tz, -6)),
       senjaSipil: () => v(ws.isya(d, mo, y, lon, lat, tz, -6)), senjaNaut: () => v(ws.isya(d, mo, y, lon, lat, tz, -12)), senjaAstro: () => v(ws.isya(d, mo, y, lon, lat, tz, -18)),
       bulanTerbit: () => this._bulan(d, mo, y, L, "RISE"), bulanTransit: () => this._bulan(d, mo, y, L, "TRANSIT"), bulanTerbenam: () => this._bulan(d, mo, y, L, "SET"),
-      lamaSiang: () => { const a = G.syuruk(), b = G.magrib(); return a == null || b == null ? null : this._mod24(b - a); },
+      lamaSiang: () => {                                   // siang kutub: 24 jam (Matahari tak terbenam) atau 0 (tak terbit)
+        const a = ws.syuruk(d, mo, y, lon, lat, elev, tz), b = ws.magrib(d, mo, y, lon, lat, elev, tz);
+        if (a.isNormal && b.isNormal) return this._mod24(b.time - a.time);
+        if (a.status === SalatStatus.up || b.status === SalatStatus.up) return 24;
+        if (a.status === SalatStatus.down || b.status === SalatStatus.down) return 0;
+        return null;
+      },
       lamaMalam: () => { const s = G.lamaSiang(); return s == null ? null : 24 - s; },
     };
     const out = {}; keys.forEach(k => { out[k] = G[k](); }); return out;

@@ -7,8 +7,18 @@
 const UI = (() => {
   const $ = id => document.getElementById(id);
   const pad = n => String(n).padStart(2, "0");
-  const CITIES = { "Yogyakarta":[-7.7956,110.3695,7,100], "Jakarta":[-6.2088,106.8456,7,8], "Bandung":[-6.9175,107.6191,7,768], "Surabaya":[-7.2575,112.7521,7,5],
-    "Makassar":[-5.1477,119.4327,8,10], "Jayapura":[-2.5337,140.7181,9,5], "Makkah":[21.4225,39.8262,3,300], "New Delhi":[28.6139,77.209,5.5,216], "Kuala Lumpur":[3.139,101.6869,8,60] };
+  // [lintang, bujur, zona (jam, waktu standar tanpa DST), ketinggian (m)]
+  const KELOMPOK_KOTA = [
+    ["Indonesia", { "Yogyakarta":[-7.7956,110.3695,7,100], "Jakarta":[-6.2088,106.8456,7,8], "Bandung":[-6.9175,107.6191,7,768], "Surabaya":[-7.2575,112.7521,7,5], "Makassar":[-5.1477,119.4327,8,10], "Jayapura":[-2.5337,140.7181,9,5],
+      "Lubuklinggau":[-3.29667,102.86167,7,130], "Batang":[-6.90814,109.73037,7,5], "Ponorogo":[-7.8685,111.462,7,103], "Blitar":[-8.09824,112.16508,7,167], "Trenggalek":[-8.05,111.7167,7,110],
+      "Tulungagung":[-8.06667,111.9,7,85], "Parepare":[-4.01667,119.62361,8,22], "Melak":[-0.2372,115.8132,8,30] }],
+    ["Dunia · belahan utara", { "Makkah":[21.4225,39.8262,3,300], "New Delhi":[28.6139,77.209,5.5,216], "Kairo":[30.0444,31.2357,2,23], "Istanbul":[41.0082,28.9784,3,40], "London":[51.5074,-0.1278,0,11],
+      "Oslo":[59.9139,10.7522,1,23], "Reykjavik":[64.1466,-21.9426,0,10], "Tromsø (Norwegia)":[69.6492,18.9553,1,10] }],
+    ["Dunia · dekat khatulistiwa", { "Pontianak":[-0.0263,109.3425,7,1], "Kuala Lumpur":[3.139,101.6869,8,60], "Quito":[-0.1807,-78.4678,-5,2850] }],
+    ["Dunia · belahan selatan", { "Cape Town":[-33.9249,18.4241,2,25], "Sydney":[-33.8688,151.2093,10,58], "Buenos Aires":[-34.6037,-58.3816,-3,25], "Christchurch":[-43.5321,172.6362,12,20],
+      "Ushuaia":[-54.8019,-68.303,-3,10], "Stasiun McMurdo (Antartika)":[-77.8463,166.6762,12,10] }],
+  ];
+  const CITIES = Object.assign({}, ...KELOMPOK_KOTA.map(g => g[1]));
   const KUSTOM = "Kustom";
   const tabs = []; let active = null, timer = null;
 
@@ -130,7 +140,10 @@ const UI = (() => {
 
   function start() {
     const kk = document.createElement("option"); kk.value = KUSTOM; kk.textContent = "Kustom (isi manual)"; $("city").appendChild(kk);
-    Object.keys(CITIES).forEach(k => { const o = document.createElement("option"); o.value = k; o.textContent = k; $("city").appendChild(o); });
+    KELOMPOK_KOTA.forEach(([nama, kota]) => {
+      const g = document.createElement("optgroup"); g.label = nama;
+      Object.keys(kota).forEach(k => { const o = document.createElement("option"); o.value = k; o.textContent = k; g.appendChild(o); }); $("city").appendChild(g);
+    });
     PrayerMethod.predefined.forEach((m, i) => { const o = document.createElement("option"); o.value = i; o.textContent = m.name; $("method").appendChild(o); });
     $("city").value = "Yogyakarta"; isiKota(); hariIni();
     const s = muat();                                     // pulihkan setelan terakhir
